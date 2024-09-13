@@ -1,0 +1,4 @@
+	whole_genome
+mCG	0.8208
+mCHG	0.0249
+mCHH	0.0117

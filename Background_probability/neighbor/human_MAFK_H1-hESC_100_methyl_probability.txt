@@ -1,0 +1,4 @@
+	neighbor
+mCG	0.4883
+mCHG	0.0183
+mCHH	0.0100
