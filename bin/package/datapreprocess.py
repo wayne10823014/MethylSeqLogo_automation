@@ -119,14 +119,14 @@ def get_seq(species, seq, tfbs_modify_coordinate, span1, span2):
     tfbss_fasta = open(tfbss_fa.seqfn).readlines()
     count = 0
     for rows in range(len(tfbss_fasta)):
-      
         if tfbss_fasta[rows].startswith('>'):
-           
+            
             chr = seq[count][0]
             tfbsstartpos = int(seq[count][1]) + span1
             tfbsendpos  = int(seq[count][2]) - span2
             strand = tfbss_fasta[rows][-3]
             key = '>'+str(chr)+':'+str(tfbsstartpos)+'-'+str(tfbsendpos)+strand
+    
             count += 1 
             continue
 
@@ -137,7 +137,7 @@ def get_seq(species, seq, tfbs_modify_coordinate, span1, span2):
             total[key].append([0]*motif_len)
             for base in range(span1, span1+motif_len, 1):
                 if tfbss_fasta[rows][base] not in ["c", "C", "g", "G"]:
-                    continue
+                            continue
                 else:
                     temp = total[key][0]
                     if strand == '+' and tfbss_fasta[rows][base] in ["c", "C"]:
@@ -161,6 +161,7 @@ def get_seq(species, seq, tfbs_modify_coordinate, span1, span2):
 
                     elif strand == '-' and tfbss_fasta[rows][base] in ["G", "g"]:
                         #CG condition | C base
+                     
                         if tfbss_fasta[rows][base-1] in ["c", "C"] :
                             
                             temp[base-span1] = 'x'
@@ -231,16 +232,20 @@ def methylread_counter(TFBSFile, WGBSFile):
                 temp[int(base_MethylationInfo_pos)-int(tfbsstartpos)] = temp[int(base_MethylationInfo_pos)-int(tfbsstartpos)] + capped_read- methyl_read
     
                 #cread
+ 
                 temp1 = total[key][2]
                 temp1[int(base_MethylationInfo_pos)-int(tfbsstartpos)] = temp1[int(base_MethylationInfo_pos)-int(tfbsstartpos)] + methyl_read
             else:
-                temp = total[key][1]
-                key = -(int(base_MethylationInfo_pos)-int(tfbsstartpos))-1
-                temp[key] = temp[key] + capped_read- methyl_read
+                try:
+                  temp = total[key][1]
+                  key = -(int(base_MethylationInfo_pos)-int(tfbsstartpos))-1
+                  temp[key] = temp[key] + capped_read- methyl_read
     
-                #cread
-                temp1 = total[key][2]
-                temp1[key] = temp1[key] + methyl_read
+                  #cread
+                  temp1 = total[key][2]
+                  temp1[key] = temp1[key] + methyl_read
+                except:
+                  pass
         end = time.time()
 
         count += 1
@@ -276,4 +281,4 @@ def methylread_counter(TFBSFile, WGBSFile):
 
 
 
-
+ 
