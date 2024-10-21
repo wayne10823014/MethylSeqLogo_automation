@@ -16,7 +16,7 @@ global motif_len
 motif_len = 0
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
-path = dir_path + "/../../Output/"
+path = dir_path + "/../../Output1/"
 
 def flanking_bed(tfbs_of_tf_in_celltype, span1, span2):
     
@@ -238,13 +238,14 @@ def methylread_counter(TFBSFile, WGBSFile):
             else:
                 try:
                   temp = total[key][1]
-                  key = -(int(base_MethylationInfo_pos)-int(tfbsstartpos))-1
-                  temp[key] = temp[key] + capped_read- methyl_read
+                  index = int(tfbsstartpos) - int(base_MethylationInfo_pos)-1
+                  temp[index] = temp[index] + capped_read- methyl_read
     
                   #cread
                   temp1 = total[key][2]
-                  temp1[key] = temp1[key] + methyl_read
+                  temp1[index] = temp1[index] + methyl_read
                 except:
+                  print("Error")
                   pass
         end = time.time()
 
@@ -264,6 +265,8 @@ def methylread_counter(TFBSFile, WGBSFile):
         except:
             pass
     
+    print("Saving ctx_dict to CSV...")
+    print("Current working directory:", os.getcwd())
     ctx_dict = pd.DataFrame(ctx)
     ctx_dict.to_csv("MYC_H1_whole_genome_binding_sites_ctx.csv", sep = '\t', index = False) 
     cread_dict = pd.DataFrame(cread)
@@ -271,7 +274,7 @@ def methylread_counter(TFBSFile, WGBSFile):
 
     tread_dict = pd.DataFrame(tread)
     tread_dict.to_csv("MYC_H1_whole_genome_binding_sites_tread.csv", sep = '\t', index = False) 
-
+    print("ctx_dict saved.")
     return ctx_dict,cread_dict, tread_dict
 
 
