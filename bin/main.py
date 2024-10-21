@@ -125,6 +125,24 @@ def main():
     print(creaddata)
     print(treaddata)
 
+    output_dir = "/home/wayne/MethylSeqLogo_automation/Output1"
+
+    # 確保目錄存在，如果不存在則創建
+    os.makedirs(output_dir, exist_ok=True)
+
+    # 文件名的前綴
+    logoname = TF + '_' + species + '_' + celltype + '_' + region + '_' + mode + '_' + logotype + '_'
+
+    # 使用 os.path.join 將路徑和文件名連接起來
+    ctx_filepath = os.path.join(output_dir, logoname + "ctx.csv")
+    cread_filepath = os.path.join(output_dir, logoname + "cread.csv")
+    tread_filepath = os.path.join(output_dir, logoname + "tread.csv")
+
+    # 將數據存成 CSV 文件
+    ctxdata.to_csv(ctx_filepath, sep='\t', index=False)
+    creaddata.to_csv(cread_filepath, sep='\t', index=False)
+    treaddata.to_csv(tread_filepath, sep='\t', index=False)
+
     global pseudocount
     pseudocount = 1.0
 
