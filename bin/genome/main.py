@@ -149,8 +149,8 @@ def main():
         plotobj = seqLogoPlot(fig, celltype, four_base_heights, entropys, Cmethyls, Gmethyls, bgpps, dientropys, bg_dientropys_max, bg_dientropys_min, bg_mCG, bg_mCHG, bg_mCHH, Freqs_)
         plotobj.plotlogo()
         logoname = TF + '_' + species + '_' + celltype + '_' + region + '_' + mode + '_' + logotype + '_seqlogo.png'
-        plt.savefig(dir_path + '/../Output/' + logoname, bbox_inches = 'tight', dpi = 600)
-        print (logoname + ' is saved in' + dir_path + '/../Output/.')
+        plt.savefig(dir_path + '/../Output1/' + logoname, bbox_inches = 'tight', dpi = 600)
+        print (logoname + ' is saved in' + dir_path + '/../Output1/.')
     # elif logotype == 'riverlake':
     #     dippm = to4basedippm(seqdata)
     #     Cents = methylationEntropy(JiCs, PiCs, J_bCG, J_bCHG, J_bCHH, logotype)

@@ -12,7 +12,7 @@ import numpy as np
 import itertools
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
-path = dir_path + "/../../Output/"
+path = dir_path + "/../../Output1/"
 global cpu_count
 cpu_count = mp.cpu_count()
 
@@ -27,16 +27,16 @@ def isfile(path,flag=1):
             print (path + "はありませんでした。ジョブがキャンセルされました。")
     if os.path.isfile(path):
         data = pd.read_table(path, sep= "\t", header= 0, index_col= 0)
+        return data
     else:
         print (path + " does not exist. Job cancelled.")
         print (path + "檔案不存在，工作終止。")
         print (path + "はありませんでした。ジョブがキャンセルされました。")
         
-        raise SystemExit(0)
-    return data
+    
     
 
-def read_bgprob_table(species, tissue, region,TF=None):
+def read_bgprob_table(species, celltype, region,TF=None):
     """
     Read background probability table \n
     #### bg_table content
@@ -51,11 +51,11 @@ def read_bgprob_table(species, tissue, region,TF=None):
     """
     if region == 'whole_genome':
         species_path = dir_path + "/../../Background_probability/"+ region + "/" + species + '_' + region + '_probability.txt'
-        celltype_path = dir_path + "/../../Background_probability/"+ region + "/" + species + '_' + tissue + '_' + region  +'_methyl_probability.txt'
+        celltype_path = dir_path + "/../../Background_probability/"+ region + "/" + species + '_' + celltype + '_' + region  +'_methyl_probability.txt'
     else:
-        species_path = dir_path + "/../../Background_probability/neighbor/"  + species + '_' + TF + '_' + tissue + '_' + region + '_probability.txt'
-        # species_path = dir_path + "/../../Background_probability/"+ region + "/"  + species + '_' + tissue + '_' + region + '_probability.txt'
-        celltype_path = dir_path + "/../../Background_probability/neighbor/" + species + '_' + TF + '_' + tissue + '_' + region  +'_methyl_probability.txt'
+        species_path = dir_path + "/../../Background_probability/neighbor/"  + species + '_' + TF + '_' + celltype + '_' + region + '_probability.txt'
+        # species_path = dir_path + "/../../Background_probability/"+ region + "/"  + species + '_' + celltype + '_' + region + '_probability.txt'
+        celltype_path = dir_path + "/../../Background_probability/neighbor/" + species + '_' + TF + '_' + celltype + '_' + region  +'_methyl_probability.txt'
     
     # path = 'MethylSeqLogo_automation/Background_probability/Background_probability/human_HepG2_probability.txt' 
     species_path = isfile(species_path)
@@ -68,9 +68,9 @@ def read_bgprob_table(species, tissue, region,TF=None):
 
     bgpps= probmatrix[['A', 'C', 'G', 'T', 'CpG', 'CHG', 'CHH', 'AA', 'AC', 'AG', 'AT', 'CA', 'CC', 'CG', 'CT', 'GA', 'GC', 'GG', 'GT', 'TA', 'TC', 'TG', 'TT']]
     
-    print ("background probabilities: ")
-    print (bgpps)
-    print ("\n")
+    # print ("background probabilities: ")
+    # print (bgpps)
+    # print ("\n")
 
     data= pd.DataFrame(celltype_path)
     probmatrix= data[region].astype('float64')
@@ -142,6 +142,7 @@ def calc(seq):
 
 
 def read_file(file, species, celltype, region , dir,TF):    
+    print('~~read_file~~') 
     filestime = time.time()
     cpg, chg, chh =[0, 0, 0] 
 
@@ -222,7 +223,7 @@ def  read_big_file(big_fileA, big_fileB):
 
 
 def calc_mlevel(fileA, fileB):
-
+    print('~~calc_mlevel~~')
     total, count, mismatch = 0, 0, 0
     length = 900000000
     s_time = time.time()
@@ -260,7 +261,7 @@ def calc_mlevel(fileA, fileB):
 
 
 def culc_mlevel(tfbs_bed, wgbs_file, speciesname, celltype, region, dir, TF):
- 
+    print('~~culc_mlevel neighbor~~')
     TFBSs = tfbs_bed
     name = ['CG', 'CHG', 'CHH'] 
     total = []
@@ -299,9 +300,10 @@ def culc_mlevel(tfbs_bed, wgbs_file, speciesname, celltype, region, dir, TF):
 
 
     df = pd.DataFrame(total, columns=[dir],index=['mCG','mCHG', 'mCHH' ])
+    print('～～存檔中~~')
     path = dir_path + '/../../Background_probability/' + dir + '/'+ speciesname + '_' + TF + '_'+ celltype +'_' + region +'_methyl_probability.txt'
     df.to_csv(path, sep='\t', float_format = '%.4f')    
-
+    print('～～存好了~~')
 
 
 

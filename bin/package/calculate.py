@@ -10,7 +10,7 @@ dinucs= ['AA', 'AC', 'AG', 'AT', 'CA', 'CC', 'CG', 'CT', 'GA', 'GC', 'GG', 'GT',
 nucleotides = ['A', 'C', 'G', 'T']
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
-path = dir_path + "/../../Output/"
+path = dir_path + "/../../Output1/"
 
 
 def calc_ppm(seqdata, TF, species, celltype, region, pseudocount=1):
@@ -40,8 +40,8 @@ def calc_ppm(seqdata, TF, species, celltype, region, pseudocount=1):
 	ppm.to_csv(path + ppmname, sep='\t', index=False,
 			   header=True, float_format='%.4f')
 
-	print("Position probability matrix: ")
-	print(ppm)
+	# print("Position probability matrix: ")
+	# print(ppm)
 	print('\n')
 
 	return ppm
@@ -143,17 +143,17 @@ def calc_methylprob(ctxdata, creaddata, treaddata, bg_mCG, bg_mCHG, bg_mCHH, plo
 
 	Methyls.insert(loc= 0, column= 'position', value= list(range(1, plotlen + 1)))	
 
-	print ("Methylation probabilities: ")
-	print (Methyls)
-	print ('\n')
+	# print ("Methylation probabilities: ")
+	# print (Methyls)
+	# print ('\n')
 
 	Freqs= [list(sum(i, ())) for i in PiCs]
 	Freqs= pd.DataFrame(Freqs, columns= ['CpG_p', 'CpG_m', 'CHG_p', 'CHG_m', 'CHH_p', 'CHH_m'])
 	Freqs.insert(loc= 0, column= 'position', value= list(range(1, plotlen + 1)))
 
-	print ("Context probabilities: ")
-	print (Freqs)
-	print ('\n')
+	# print ("Context probabilities: ")
+	# print (Freqs)
+	# print ('\n')
 
 	# Freqs_ = [list(sum(i, ())) for i in PiCs]
 	Freqs_C= pd.DataFrame(PiCs_, columns= ['CpG_p', 'CHG_p', 'CHH_p'])
@@ -161,9 +161,9 @@ def calc_methylprob(ctxdata, creaddata, treaddata, bg_mCG, bg_mCHG, bg_mCHH, plo
 	Freqs_G = pd.DataFrame(PiGs_, columns= ['CpG_m', 'CHG_m', 'CHH_m'])
 	Freqs_C_only = pd.concat([Freqs_C, Freqs_G], axis= 1)
 
-	print ("Context probabilities (C only): ")
-	print (Freqs_C_only)
-	print ('\n')
+	# print ("Context probabilities (C only): ")
+	# print (Freqs_C_only)
+	# print ('\n')
 
 	return C_ratio, G_ratio, Cmethyls, Gmethyls, Freqs_C_only
 
@@ -320,8 +320,8 @@ def to4basedippm(seqdata, plotlen):
 	dippm = pd.DataFrame(probs, columns=dinucs)
 	dippm = dippm.T.astype('float64')
 
-	print("Dinucleotide probability matrix: ")
-	print(dippm)
+	# print("Dinucleotide probability matrix: ")
+	# print(dippm)
 
 	return dippm
 
@@ -349,10 +349,10 @@ def twomerBg(bgpps, dippm, plotlen):
 			dientropis[dinuc].append(
 				dippm.loc[dinuc][i] * (math.log(bgpps.loc[d1]*bgpps.loc[d2], 2) - math.log(bgpps.loc[dinuc], 2)))
 	print("\n")
-	print("Dimer enrichment scores: " + "\n")
+	# print("Dimer enrichment scores: " + "\n")
 	series = pd.Series(dimerenrichments)
-	print(series)
-	print("\n")
+	# print(series)
+	# print("\n")
 
 	print("Depleted dimer binding scores: " + "\n")
 	series2 = pd.DataFrame.from_dict(dientropis, orient='columns')

@@ -90,8 +90,23 @@ def main():
     print(len(seqdata))  
     start = time.time()
 
+    output_dir = "/home/wayne/MethylSeqLogo_automation/Output1/"
 
-    ctxdata, creaddata, treaddata = methylread_counter(tfbs_bed, methylbed)
+    logoname = output_dir + TF + '_' + species + '_' + celltype + '_' + region + '_' + mode + '_' + logotype + '_'
+
+    ctx_file = logoname + 'ctx.csv'
+    cread_file = logoname + 'cread.csv'
+    tread_file = logoname + 'tread.csv'
+
+    print(ctx_file)
+
+    # 檢查文件是否存在
+    if os.path.isfile(ctx_file) and os.path.isfile(cread_file) and os.path.isfile(tread_file):
+        ctxdata = pd.read_csv(ctx_file, sep='\t')
+        creaddata = pd.read_csv(cread_file, sep='\t')
+        treaddata = pd.read_csv(tread_file, sep='\t')
+    else:
+        ctxdata, creaddata, treaddata = methylread_counter(tfbs_bed, methylbed)
     
     end = time.time()
     print('\nmethylatedread_counter finished...,total cost', (end-start)//60, 'min\n')
@@ -117,13 +132,13 @@ def main():
   
     print("\n")
     seqdata = seqdata.iloc[:, beginningoftfbs - 1 + spanL : beginningoftfbs - 1 + spanL + motif_len]
-    print(seqdata)
+    # print(seqdata)
     ctxdata = ctxdata.iloc[:, beginningoftfbs - 1:endpos]
-    print(ctxdata)
+    # print(ctxdata)
     creaddata = creaddata.iloc[:, beginningoftfbs - 1 : endpos]
     treaddata = treaddata.iloc[:, beginningoftfbs - 1 : endpos]
-    print(creaddata)
-    print(treaddata)
+    # print(creaddata)
+    # print(treaddata)
 
     output_dir = "/home/wayne/MethylSeqLogo_automation/Output1"
 
@@ -153,22 +168,27 @@ def main():
     if region == 'whole_genome':
         bgpps, bg_mCG, bg_mCHG, bg_mCHH = read_bgprob_table(species, celltype, region)
     elif (region.isdigit()):
-
+       print('~~neighbor~~')
        path = dir_path + "/../Background_probability/neighbor/"+ species + '_' + TF  +'_'+ celltype + '_' + region + '_probability.txt'
-       if os.path.isfile(path):
+       path1 = dir_path + "/../Background_probability/neighbor/" + species + '_' + TF + '_' + celltype + '_' + region  +'_methyl_probability.txt'
+       if os.path.isfile(path) and os.path.isfile(path1):
+            print('~~find neighbor~~')
             bgpps,  bg_mCG, bg_mCHG, bg_mCHH = read_bgprob_table(species, celltype, region, TF)
        else:
-            
+            print('~~not find neighbor~~')
             flankingbed = flanking_bed(tfbs_bed, spanL, spanR)
             bgpps,  bg_mCG, bg_mCHG, bg_mCHH =  neighbor(flankingbed, species, methylbed, celltype, region, TF)
 
     else:
+       print('~~promoter~~')
        start = time.time()
        path = dir_path + "/../Background_probability/promoter/"+ species + '_' + celltype + '_' + region + '_probability.txt'
-       if os.path.isfile(path):
+       path1 = dir_path + "/../Background_probability/promoter/"+ species + '_' + celltype + '_' + region +'_methyl_probability.txt'
+       if os.path.isfile(path) and os.path.isfile(path1):
+            print('~~find promoter~~')
             bgpps,  bg_mCG, bg_mCHG, bg_mCHH = read_bgprob_table(species, celltype, region)
        else:
-
+            print('~~not find promoter~~')
             bgpps,  bg_mCG, bg_mCHG, bg_mCHH =  promoter(tfbs_bed, species, methylbed, celltype, region)
             end = time.time()
             print('promoter bg calc finished...,total cost', (end-start)//60, 'min\n')
@@ -188,7 +208,7 @@ def main():
         plotobj.plotlogo()
         logoname = 'wayne'+TF + '_' + species + '_' + celltype + '_' + region + '_' + mode + '_' + logotype + '_seqlogo.png'
         plt.savefig(dir_path + '/../Output1/' + logoname, bbox_inches = 'tight', dpi = 600)
-        print (logoname + ' is saved in' + dir_path + '/../Output/.')
+        print (logoname + ' is saved in' + dir_path + '/../Output1/.')
     elif logotype == 'riverlake':
         dippm = to4basedippm(seqdata)
         Cents = calc_methylation_entropy(C_ratio, G_ratio, bg_mCG, bg_mCHG, bg_mCHH, logotype)
@@ -199,8 +219,8 @@ def main():
         riverlakeobj = riverLake(fig, celltype, ppm, dippm, Cmethyls, Gmethyls, bgpps, bg_mCG, bg_mCHG, bg_mCHH, Freqs_)
         riverlakeobj.plotRiverLake()
         logoname = TF + '_' + species + '_' + celltype + '_' + region + '_' + mode + '_' + logotype + '_seqlogo_bar7.pdf'
-        plt.savefig(dir_path + '/../Output/' + logoname, bbox_inches = 'tight', dpi = 600)
-        print (logoname + ' is saved in' + dir_path + '/../Output/.')
+        plt.savefig(dir_path + '/../Output1/' + logoname, bbox_inches = 'tight', dpi = 600)
+        print (logoname + ' is saved in' + dir_path + '/../Output1/.')
     elif logotype == 'all':
         for i in ['Kullback-Liebler', 'Shannon']:
             # Cents = methylationEntropy(JiCs, PiCs, J_bCG, J_bCHG, J_bCHH, logotype)
@@ -212,8 +232,8 @@ def main():
             plotobj = seqLogoPlot(fig, celltype, four_base_heights, entropys, Cmethyls, Gmethyls, bgpps, bg_mCG, bg_mCHG, bg_mCHH, Freqs_)
             plotobj.plotlogo()
             logoname = TF + '_' + species + '_' + celltype + '_' + region + '_' + mode + '_' + i + '_seqlogo_bar7.pdf'
-            plt.savefig(dir_path + '/../Output/' + logoname, bbox_inches = 'tight', dpi = 600)
-            print (logoname + ' is saved in ./Output/.')
+            plt.savefig(dir_path + '/../Output1/' + logoname, bbox_inches = 'tight', dpi = 600)
+            print (logoname + ' is saved in ./Output1/.')
         dippm = to4basedippm(seqdata)
         dientropys = twomerBg(bgpps, dippm)
         Cents = calc_methylation_entropy(C_ratio, G_ratio, bg_mCG, bg_mCHG, bg_mCHH, 'riverlake')
@@ -225,8 +245,8 @@ def main():
         riverlakeobj = riverLake(fig, celltype, ppm, dippm, Cmethyls, Gmethyls, bgpps, bg_mCG, bg_mCHG, bg_mCHH, Freqs_)
         riverlakeobj.plotRiverLake()
         logoname = TF + '_' + species + '_' + celltype + '_' + region + '_' + mode + '_' + 'riverlake' + '_seqlogo_bar7.png'
-        plt.savefig(dir_path + '/../Output/' + logoname, bbox_inches = 'tight', dpi = 600)
-        print (logoname + ' is saved in ./Output/.')	
+        plt.savefig(dir_path + '/../Output1/' + logoname, bbox_inches = 'tight', dpi = 600)
+        print (logoname + ' is saved in ./Output1/.')	
     fileend = time.time()
     print('total cost:', (fileend-filestart)/60, 'min')
     print ("\n")
