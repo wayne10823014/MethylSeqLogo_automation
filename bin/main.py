@@ -206,7 +206,7 @@ def main():
         fig = set_fig(entropys, logotype, mode, plotlen)
         plotobj = seqLogoPlot(fig, celltype, four_base_heights, entropys, Cmethyls, Gmethyls, bgpps, dientropys, bg_dientropys_max, bg_dientropys_min, bg_mCG, bg_mCHG, bg_mCHH, Freqs_, mode, plotlen, threshold, TF)
         plotobj.plotlogo()
-        logoname = 'wayne'+TF + '_' + species + '_' + celltype + '_' + region + '_' + mode + '_' + logotype + '_seqlogo.png'
+        logoname = TF + '_' + species + '_' + celltype + '_' + region + '_' + mode + '_' + logotype + '_seqlogo.png'
         plt.savefig(dir_path + '/../Output1/' + logoname, bbox_inches = 'tight', dpi = 600)
         print (logoname + ' is saved in' + dir_path + '/../Output1/.')
     elif logotype == 'riverlake':
