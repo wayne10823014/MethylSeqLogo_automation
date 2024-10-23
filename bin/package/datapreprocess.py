@@ -277,11 +277,3 @@ def methylread_counter(TFBSFile, WGBSFile):
     print("ctx_dict saved.")
     return ctx_dict,cread_dict, tread_dict
 
-
-
-
-
-
-
-
- 

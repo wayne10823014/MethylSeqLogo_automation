@@ -61,7 +61,6 @@ def main():
         print ("Plotting " + TF + ' ' + mode + ' all logos of ' + species + ' ' + celltype + '.')
     print ("\n")
     
-    
 
 
     # span = 50 if region == "promoter" else 2 

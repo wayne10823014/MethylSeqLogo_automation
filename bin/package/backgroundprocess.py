@@ -293,8 +293,6 @@ def culc_mlevel(tfbs_bed, wgbs_file, speciesname, celltype, region, dir, TF):
         total.append(result)
         count += 1
         
-
-
        
 
 
