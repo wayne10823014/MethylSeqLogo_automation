@@ -4,6 +4,9 @@ import pandas as pd
 from decimal import *
 import numpy as np
 import matplotlib
+import sys
+import unittest
+
 # matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.patheffects
@@ -247,8 +250,41 @@ def main():
         plt.savefig(dir_path + '/../Output1/' + logoname, bbox_inches = 'tight', dpi = 600)
         print (logoname + ' is saved in ./Output1/.')	
     fileend = time.time()
-    print('total cost:', (fileend-filestart)/60, 'min')
+
+    total_time = fileend - filestart
+    minutes = total_time // 60
+    seconds = round(total_time % 60)
+    print(f"Total cost: {int(minutes)} min {seconds} sec")
     print ("\n")
+
+
+    print("正在運行測試以驗證輸出是否正確...")
+    # 添加測試代碼
+    # 確保 test_methylseqlogo_outputs.py 可以被導入
+    # 如果在 package 目錄下，使用 from package import test_methylseqlogo_outputs
+
+    # 導入測試模塊
+    try:
+        from package import test_methylseqlogo_outputs
+    except ImportError:
+        import test_methylseqlogo_outputs
+
+    # 創建測試加載器和測試套件
+    loader = unittest.TestLoader()
+    suite = loader.loadTestsFromModule(test_methylseqlogo_outputs)
+
+    # 運行測試
+    runner = unittest.TextTestRunner()
+    result = runner.run(suite)
+
+    # 檢查測試結果
+    if not result.wasSuccessful():
+        print("測試未通過，輸出存在錯誤。")
+        sys.exit(1)  # 退出程序，返回錯誤碼
+    else:
+        print("所有測試通過，輸出正確。")
+
+
 
 # main()
 if __name__ == '__main__':
