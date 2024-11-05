@@ -13,7 +13,7 @@
     <!-- JavaScript 代码 -->
     <script type="text/javascript">
       // 定义 ppm.json 的文件名
-      const ppmname = "../../../Output1/MAX_human_H1-hESC_50_ppm.json";  // 使用模板占位符
+      const ppmname = "{{ ppmname }}";  // 使用模板占位符
 
       // 从 ppm.json 加载 PPM 数据
       fetch(ppmname)
@@ -33,6 +33,5 @@
         })
         .catch(error => console.error('加载 PPM 数据出错:', error));
     </script>
-    
   </body>
 </html>

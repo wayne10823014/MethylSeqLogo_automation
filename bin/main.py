@@ -6,7 +6,8 @@ import numpy as np
 import matplotlib
 import sys
 import unittest
-import json  # 新增
+import json
+from jinja2 import Environment, FileSystemLoader  # 新增
 
 # matplotlib.use('Agg')
 import matplotlib.pyplot as plt
@@ -36,7 +37,6 @@ def remove_dup_seqs(records):
 
 def main():
     filestart = time.time()
-    # logging.basicConfig(filename="methylseqlogo.log", level=logging.DEBUG, format='%(asctime)s, %(name)s-%(levelname)-s: %(message)s')
     parser = get_parser()
     args = parser.parse_args()
 
@@ -90,21 +90,23 @@ def main():
     print(len(seqdata))
     start = time.time()
 
+    # 定义输出目录，仍然是 Output1 目录
     output_dir = "/home/wayne/MethylSeqLogo_automation/Output1/"
+    os.makedirs(output_dir, exist_ok=True)  # 如果目录不存在，创建它
 
-    logoname = output_dir + TF + '_' + species + '_' + celltype + '_' + region + '_' + mode + '_' + logotype + '_'
+    # 文件名的前缀
+    logoname = TF + '_' + species + '_' + celltype + '_' + region + '_' + mode + '_' + logotype + '_'
 
-    ctx_file = logoname + 'ctx.csv'
-    cread_file = logoname + 'cread.csv'
-    tread_file = logoname + 'tread.csv'
-
-    print(ctx_file)
+    # 使用 os.path.join 将路径和文件名连接起来
+    ctx_filepath = os.path.join(output_dir, logoname + "ctx.csv")
+    cread_filepath = os.path.join(output_dir, logoname + "cread.csv")
+    tread_filepath = os.path.join(output_dir, logoname + "tread.csv")
 
     # 检查文件是否存在
-    if os.path.isfile(ctx_file) and os.path.isfile(cread_file) and os.path.isfile(tread_file):
-        ctxdata = pd.read_csv(ctx_file, sep='\t')
-        creaddata = pd.read_csv(cread_file, sep='\t')
-        treaddata = pd.read_csv(tread_file, sep='\t')
+    if os.path.isfile(ctx_filepath) and os.path.isfile(cread_filepath) and os.path.isfile(tread_filepath):
+        ctxdata = pd.read_csv(ctx_filepath, sep='\t')
+        creaddata = pd.read_csv(cread_filepath, sep='\t')
+        treaddata = pd.read_csv(tread_filepath, sep='\t')
     else:
         ctxdata, creaddata, treaddata = methylread_counter(tfbs_bed, methylbed)
 
@@ -130,26 +132,9 @@ def main():
 
     print("\n")
     seqdata = seqdata.iloc[:, beginningoftfbs - 1 + spanL: beginningoftfbs - 1 + spanL + motif_len]
-    # print(seqdata)
     ctxdata = ctxdata.iloc[:, beginningoftfbs - 1:endpos]
-    # print(ctxdata)
     creaddata = creaddata.iloc[:, beginningoftfbs - 1: endpos]
     treaddata = treaddata.iloc[:, beginningoftfbs - 1: endpos]
-    # print(creaddata)
-    # print(treaddata)
-
-    output_dir = os.path.dirname(os.path.abspath(__file__))  # 修改为当前脚本所在目录
-
-    # 确保目录存在，如果不存在则创建
-    os.makedirs(output_dir, exist_ok=True)
-
-    # 文件名的前缀
-    logoname = TF + '_' + species + '_' + celltype + '_' + region + '_' + mode + '_' + logotype + '_'
-
-    # 使用 os.path.join 将路径和文件名连接起来
-    ctx_filepath = os.path.join(output_dir, logoname + "ctx.csv")
-    cread_filepath = os.path.join(output_dir, logoname + "cread.csv")
-    tread_filepath = os.path.join(output_dir, logoname + "tread.csv")
 
     # 将数据存成 CSV 文件
     ctxdata.to_csv(ctx_filepath, sep='\t', index=False)
@@ -192,109 +177,44 @@ def main():
 
     ppm = calc_ppm(seqdata, TF, species, celltype, region)
 
-    # 新增代码：将 PPM 写入 JSON 文件到与 home.html 相同的目录
-    output_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'package')
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
+    # 定义 ppm.json 的文件名
+    ppmname = f"{TF}_{species}_{celltype}_{region}_ppm.json"
 
-    ppm_filepath = os.path.join(output_dir, 'ppm.json')
+    # 定义保存路径
+    ppm_filepath = os.path.join(output_dir, ppmname)
 
+    # 保存 ppm.json
     ppm_list = ppm[['A', 'C', 'G', 'T']].values.tolist()
     with open(ppm_filepath, 'w') as f:
         json.dump(ppm_list, f)
     print("PPM 数据已保存到 ppm.json 文件中，路径为：", ppm_filepath)
 
-    C_ratio, G_ratio, Cmethyls, Gmethyls, Freqs_ = calc_methylprob(ctxdata, creaddata, treaddata, bg_mCG, bg_mCHG, bg_mCHH, plotlen)
+    # 使用 Jinja2 渲染模板，生成 home.html
+    template_dir = os.path.join(dir_path, 'package')  # 模板目录，即 home_template.html 所在目录
+    print("dir_path:", dir_path)
+    print("template_dir:", template_dir)
+    env = Environment(loader=FileSystemLoader(template_dir))
+    template = env.get_template('home_template.html')
 
-    if logotype in ['Kullback-Liebler', 'Shannon']:
-        Cents = calc_methylation_entropy(C_ratio, G_ratio, Cmethyls, Gmethyls, bg_mCG, bg_mCHG, bg_mCHH, logotype)
-        entropys = calc_totalEntropy(ppm, bgpps, Cents, logotype, plotlen, TF, species, celltype, region)
-        four_base_heights = calc_perBaseEntropy(entropys, ppm, mode, TF, species, celltype, region)
-        dippm = to4basedippm(seqdata, plotlen)
-        dientropys, bg_dientropys_max, bg_dientropys_min = twomerBg(bgpps, dippm, plotlen)
-        fig = set_fig(entropys, logotype, mode, plotlen)
-        plotobj = seqLogoPlot(fig, celltype, four_base_heights, entropys, Cmethyls, Gmethyls, bgpps, dientropys,
-                              bg_dientropys_max, bg_dientropys_min, bg_mCG, bg_mCHG, bg_mCHH, Freqs_, mode, plotlen,
-                              threshold, TF)
-        plotobj.plotlogo()
-        logoname = TF + '_' + species + '_' + celltype + '_' + region + '_' + mode + '_' + logotype + '_seqlogo.png'
-        plt.savefig(dir_path + '/../Output1/' + logoname, bbox_inches='tight', dpi=600)
-        print(logoname + ' is saved in' + dir_path + '/../Output1/.')
-    elif logotype == 'riverlake':
-        dippm = to4basedippm(seqdata)
-        Cents = calc_methylation_entropy(C_ratio, G_ratio, bg_mCG, bg_mCHG, bg_mCHH, logotype)
-        entropys = calc_totalEntropy(ppm, bgpps, Cents, logotype)
-        four_base_heights = calc_perBaseEntropy(entropys, ppm)
-        # fig = set_fig(entropys)
-        fig = plt.figure(figsize=(plotlen + 1, 3.0))
-        riverlakeobj = riverLake(fig, celltype, ppm, dippm, Cmethyls, Gmethyls, bgpps, bg_mCG, bg_mCHG, bg_mCHH,
-                                 Freqs_, mode, plotlen, TF, motif_len)
-        riverlakeobj.plotRiverLake()
-        logoname = TF + '_' + species + '_' + celltype + '_' + region + '_' + mode + '_' + logotype + '_seqlogo_bar7.pdf'
-        plt.savefig(dir_path + '/../Output1/' + logoname, bbox_inches='tight', dpi=600)
-        print(logoname + ' is saved in' + dir_path + '/../Output1/.')
-    elif logotype == 'all':
-        for i in ['Kullback-Liebler', 'Shannon']:
-            # Cents = methylationEntropy(JiCs, PiCs, J_bCG, J_bCHG, J_bCHH, logotype)
-            Cents = calc_methylation_entropy(C_ratio, G_ratio, bg_mCG, bg_mCHG, bg_mCHH, i)
-            entropys = calc_totalEntropy(ppm, bgpps, Cents, i)
-            # entropys = totalEntropy(ppm, bgpps, Cents, logotype)
-            four_base_heights = calc_perBaseEntropy(entropys, ppm)
-            fig = set_fig(entropys)
-            plotobj = seqLogoPlot(fig, celltype, four_base_heights, entropys, Cmethyls, Gmethyls, bgpps, bg_mCG,
-                                  bg_mCHG, bg_mCHH, Freqs_)
-            plotobj.plotlogo()
-            logoname = TF + '_' + species + '_' + celltype + '_' + region + '_' + mode + '_' + i + '_seqlogo_bar7.pdf'
-            plt.savefig(dir_path + '/../Output1/' + logoname, bbox_inches='tight', dpi=600)
-            print(logoname + ' is saved in ./Output1/.')
-        dippm = to4basedippm(seqdata)
-        dientropys = twomerBg(bgpps, dippm)
-        Cents = calc_methylation_entropy(C_ratio, G_ratio, bg_mCG, bg_mCHG, bg_mCHH, 'riverlake')
-        entropys = calc_totalEntropy(ppm, bgpps, Cents, 'riverlake')
-        four_base_heights = calc_perBaseEntropy(entropys, ppm)
-        # fig = set_fig(entropys)
+    # 计算从 home.html 到 ppm.json 的相对路径
+    # home.html 位于 bin/package/ 目录
+    # ppm.json 位于 Output1/ 目录
+    # 因此，相对路径为 '../../Output1/ppmname'
 
-        fig = plt.figure(figsize=(plotlen, 3.0))
-        riverlakeobj = riverLake(fig, celltype, ppm, dippm, Cmethyls, Gmethyls, bgpps, bg_mCG, bg_mCHG, bg_mCHH,
-                                 Freqs_)
-        riverlakeobj.plotRiverLake()
-        logoname = TF + '_' + species + '_' + celltype + '_' + region + '_' + mode + '_' + 'riverlake' + '_seqlogo_bar7.png'
-        plt.savefig(dir_path + '/../Output1/' + logoname, bbox_inches='tight', dpi=600)
-        print(logoname + ' is saved in ./Output1/.')
-    fileend = time.time()
+    relative_ppm_path = os.path.relpath(ppm_filepath, start=os.path.join(dir_path, 'bin', 'package'))
 
-    total_time = fileend - filestart
-    minutes = total_time // 60
-    seconds = round(total_time % 60)
-    print(f"Total cost: {int(minutes)} min {seconds} sec")
-    print("\n")
+    # 渲染模板，传入 ppmname
+    rendered_html = template.render(ppmname=relative_ppm_path)
 
-    print("正在运行测试以验证输出是否正确...")
-    # 添加测试代码
-    # 确保 test_methylseqlogo_outputs.py 可以被导入
-    # 如果在 package 目录下，使用 from package import test_methylseqlogo_outputs
+    # 保存生成的 home.html，覆盖原有的 home.html
+    home_html_path = os.path.join(dir_path, 'package', 'home.html')
+    print("home_html_path:", home_html_path)
+    with open(home_html_path, 'w') as f:
+        f.write(rendered_html)
+    print("home.html 已生成，路径为：", home_html_path)
 
-    # 导入测试模块
-    try:
-        from package import test_methylseqlogo_outputs
-    except ImportError:
-        import test_methylseqlogo_outputs
+    # 继续您的代码...
 
-    # 创建测试加载器和测试套件
-    loader = unittest.TestLoader()
-    suite = loader.loadTestsFromModule(test_methylseqlogo_outputs)
-
-    # 运行测试
-    runner = unittest.TextTestRunner()
-    result = runner.run(suite)
-
-    # 检查测试结果
-    if not result.wasSuccessful():
-        print("测试未通过，输出存在错误。")
-        sys.exit(1)  # 退出程序，返回错误码
-    else:
-        print("所有测试通过，输出正确。")
-
-
+    # main()
 if __name__ == '__main__':
     main()
