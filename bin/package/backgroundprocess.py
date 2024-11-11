@@ -1,329 +1,403 @@
 import os
-import pandas as pd
-import pybedtools 
 import time
-from multiprocessing import Pool
-import pandas as pd
-from functools import reduce
-import multiprocessing as mp
-from package.datapreprocess import  modify_bed
-
-import numpy as np
 import itertools
+from functools import reduce
+from multiprocessing import Pool, cpu_count
 
+import pandas as pd
+import numpy as np
+import pybedtools
+
+from package.datapreprocess import modify_bed
+
+# 獲取當前腳本的目錄路徑
 dir_path = os.path.dirname(os.path.realpath(__file__))
-path = dir_path + "/../../Output1/"
-global cpu_count
-cpu_count = mp.cpu_count()
 
-def isfile(path,flag=1):
+# 定義輸出目錄路徑
+output_path = os.path.join(dir_path, "../../Output1/")
+
+# 獲取CPU核心數
+CPU_COUNT = cpu_count()
+
+
+def isfile(path, flag=1):
+    """
+    檢查文件是否存在，如果存在則讀取為 DataFrame。
+
+    參數:
+    - path (str): 文件路徑。
+    - flag (int): 標志位，默認為1。當 flag 為1時，如果文件不存在則打印警告信息。
+
+    返回:
+    - DataFrame，如果文件存在。
+    - None，如果文件不存在。
+    """
     pd.set_option('display.float_format', lambda x: '%.4f' % x)
-    if (flag):
-        if os.path.isfile(path):
-            pass
-        else:
-            print (path + " does not exist. Job cancelled.")
-            print (path + "檔案不存在，工作終止。")
-            print (path + "はありませんでした。ジョブがキャンセルされました。")
+    if flag:
+        if not os.path.isfile(path):
+            print(f"{path} does not exist. Job cancelled.")
+            print(f"{path} 檔案不存在，工作終止。")
+            return None
     if os.path.isfile(path):
-        data = pd.read_table(path, sep= "\t", header= 0, index_col= 0)
+        data = pd.read_table(path, sep="\t", header=0, index_col=0)
         return data
     else:
-        print (path + " does not exist. Job cancelled.")
-        print (path + "檔案不存在，工作終止。")
-        print (path + "はありませんでした。ジョブがキャンセルされました。")
-        
-    
-    
+        print(f"{path} does not exist. Job cancelled.")
+        print(f"{path} 檔案不存在，工作終止。")
+        return None
 
-def read_bgprob_table(species, celltype, region,TF=None):
+
+def read_bgprob_table(species, celltype, region, TF=None):
     """
-    Read background probability table \n
-    #### bg_table content
-    ['A', 'C', 'G', 'T', 'CpG', 'CHG', 'CHH', 'mCG', 'mCHG', 'mCHH', 'AA', 'AC', 'AG', 'AT', 'CA', 'CC', 'CG', 'CT', 'GA', 'GC', 'GG', 'GT', 'TA', 'TC', 'TG', 'TT']
-    #### return 
-    - bgpps : _DataFrame_  -> 
-                    A :0.2955
-                    AA:0.0979
-    - mCG : _int_ 
-    - mCHG : _int_
-    - mCHH : _int_
+    讀取背景概率表。
+
+    返回:
+    - bgpps (DataFrame): 背景概率。
+    - bg_mCG (float): 背景甲基化概率（mCG）。
+    - bg_mCHG (float): 背景甲基化概率（mCHG）。
+    - bg_mCHH (float): 背景甲基化概率（mCHH）。
     """
     if region == 'whole_genome':
-        species_path = dir_path + "/../../Background_probability/"+ region + "/" + species + '_' + region + '_probability.txt'
-        celltype_path = dir_path + "/../../Background_probability/"+ region + "/" + species + '_' + celltype + '_' + region  +'_methyl_probability.txt'
+        species_file = os.path.join(dir_path, "../../Background_probability", region,
+                                    f"{species}_{region}_probability.txt")
+        celltype_file = os.path.join(dir_path, "../../Background_probability", region,
+                                     f"{species}_{celltype}_{region}_methyl_probability.txt")
     else:
-        species_path = dir_path + "/../../Background_probability/neighbor/"  + species + '_' + TF + '_' + celltype + '_' + region + '_probability.txt'
-        # species_path = dir_path + "/../../Background_probability/"+ region + "/"  + species + '_' + celltype + '_' + region + '_probability.txt'
-        celltype_path = dir_path + "/../../Background_probability/neighbor/" + species + '_' + TF + '_' + celltype + '_' + region  +'_methyl_probability.txt'
-    
-    # path = 'MethylSeqLogo_automation/Background_probability/Background_probability/human_HepG2_probability.txt' 
-    species_path = isfile(species_path)
-    celltype_path = isfile(celltype_path)
-   
-    region = 'neighbor' if region.isdigit()  else region
-    
-    data= pd.DataFrame(species_path)
-    probmatrix= data[region].astype('float64')
+        species_file = os.path.join(dir_path, "../../Background_probability", "neighbor",
+                                    f"{species}_{TF}_{celltype}_{region}_probability.txt")
+        celltype_file = os.path.join(dir_path, "../../Background_probability", "neighbor",
+                                     f"{species}_{TF}_{celltype}_{region}_methyl_probability.txt")
 
-    bgpps= probmatrix[['A', 'C', 'G', 'T', 'CpG', 'CHG', 'CHH', 'AA', 'AC', 'AG', 'AT', 'CA', 'CC', 'CG', 'CT', 'GA', 'GC', 'GG', 'GT', 'TA', 'TC', 'TG', 'TT']]
-    
-    # print ("background probabilities: ")
-    # print (bgpps)
-    # print ("\n")
+    species_data = isfile(species_file)
+    celltype_data = isfile(celltype_file)
 
-    data= pd.DataFrame(celltype_path)
-    probmatrix= data[region].astype('float64')
+    if species_data is None or celltype_data is None:
+        print("Error reading background probability tables.")
+        return None, None, None, None
 
-    bg_mCG= probmatrix['mCG'].astype('float64') 
-    bg_mCHG= probmatrix['mCHG'].astype('float64') 
-    bg_mCHH= probmatrix['mCHH'].astype('float64') 
+    region_key = 'neighbor' if region.isdigit() else region
 
-    print ("Background methylation probabilities: ")
-    print (probmatrix[['mCG', 'mCHG', 'mCHH']])
-    print ("\n")
+    probmatrix_species = species_data[region_key].astype('float64')
+    bgpps = probmatrix_species[['A', 'C', 'G', 'T', 'CpG', 'CHG', 'CHH',
+                                'AA', 'AC', 'AG', 'AT', 'CA', 'CC', 'CG', 'CT',
+                                'GA', 'GC', 'GG', 'GT', 'TA', 'TC', 'TG', 'TT']]
+
+    probmatrix_celltype = celltype_data[region_key].astype('float64')
+    bg_mCG = probmatrix_celltype['mCG'].astype('float64')
+    bg_mCHG = probmatrix_celltype['mCHG'].astype('float64')
+    bg_mCHH = probmatrix_celltype['mCHH'].astype('float64')
+
+    print("Background methylation probabilities: ")
+    print(probmatrix_celltype[['mCG', 'mCHG', 'mCHH']])
+    print("\n")
 
     return bgpps, bg_mCG, bg_mCHG, bg_mCHH
 
 
-def calc(seq):
-    
-    if seq.startswith('>') or (seq.startswith('N') and len(set(seq))==2):
-            return 0
+def count_nucleotides_and_motifs(seq):
+    """
+    統計序列中的單核苷酸和二核苷酸頻率，並統計CpG、CHG和CHH基序的出現次數。
 
-    dimer_nucleobase_dict = {'AA': 0, 'AC': 0, 'AG': 0, 'AT': 0, 'CA': 0, 'CC': 0, 'CG': 0, 'CT': 0, 'GA': 0, 'GC': 0, 'GG': 0, 'GT': 0, 'TA': 0, 'TC': 0, 'TG': 0, 'TT': 0}
-    monome_nucleobase_dict =  {'A': 0, 'C': 0, 'G': 0, 'T': 0}
-    cpg, chg, chh= 0, 0, 0
+    參數:
+    - seq (str): DNA序列。
 
-    
-    for base in  range(0, len(seq), 1):
-        #calculate ['A', 'C', 'G', 'T', 'AA', 'AC' ... 'TG', 'TT']
-        if seq[base] in ["c", "C", "g", "G", "a", "A", "T", "t"]:
-            monome_nucleobase_dict[seq[base].upper()] += 1
-            if base  < len(seq)-1 and seq[base+1] in ["c", "C", "g", "G", "a", "A", "T", "t"]:
-                dimer = seq[base] + seq[base+1]
-                dimer_nucleobase_dict[dimer.upper()] += 1
-                
-        # calculate condition when given C/G
-        if  base >= 2 and base <= len(seq)-3:
-            
-            if seq[base] in ["c", "C"]:
-            
-                #CG condition | C base +
-                if seq[base+1] in ["g","G"] :
+    返回:
+    - 列表，包含以下內容：
+        - cpg (int): CpG位點數量。
+        - chg (int): CHG位點數量。
+        - chh (int): CHH位點數量。
+        - mononucleotide_counts (dict): A、C、G、T的計數。
+        - dinucleotide_counts (dict): 二核苷酸（AA、AC、...、TT）的計數。
+    """
+    if seq.startswith('>') or (seq.startswith('N') and len(set(seq)) == 2):
+        return 0
+
+    mononucleotide_counts = {'A': 0, 'C': 0, 'G': 0, 'T': 0}
+    dinucleotide_counts = {'AA': 0, 'AC': 0, 'AG': 0, 'AT': 0,
+                           'CA': 0, 'CC': 0, 'CG': 0, 'CT': 0,
+                           'GA': 0, 'GC': 0, 'GG': 0, 'GT': 0,
+                           'TA': 0, 'TC': 0, 'TG': 0, 'TT': 0}
+    cpg, chg, chh = 0, 0, 0
+
+    seq = seq.upper()
+    seq_length = len(seq)
+
+    for i in range(seq_length):
+        base = seq[i]
+        if base in "ACGT":
+            mononucleotide_counts[base] += 1
+
+            if i < seq_length - 1 and seq[i + 1] in "ACGT":
+                dinucleotide = base + seq[i + 1]
+                if dinucleotide in dinucleotide_counts:
+                    dinucleotide_counts[dinucleotide] += 1
+
+        # 計算CpG、CHG、CHH基序
+        if 2 <= i <= seq_length - 3:
+            if base == 'C':
+                if seq[i + 1] == 'G':
                     cpg += 1
-                    
-                #CHG condition | C base +
-                elif seq[base+2] in ["g","G"]:
+                elif seq[i + 2] == 'G':
                     chg += 1
-                    
-                #CHH condition | C base +   
                 else:
                     chh += 1
-                    
-            elif seq[base] in ["G", "g"]:
-                
-                #CG condition | G base +
-                if seq[base-1] in ["c", "C"] :
+            elif base == 'G':
+                if seq[i - 1] == 'C':
                     cpg += 1
-                    
-                #CHG condition | G base +
-                elif seq[base-2] in ["c", "C"]:
+                elif seq[i - 2] == 'C':
                     chg += 1
-                    
-                #CHH condition | G base +
                 else:
-                    chh += 1 
-           
+                    chh += 1
+
+    return [cpg, chg, chh, mononucleotide_counts, dinucleotide_counts]
 
 
-    return [cpg, chg, chh, monome_nucleobase_dict, dimer_nucleobase_dict] 
-    # return [cpg, chg, chh, monome_nucleobase_dict, dimer_nucleobase_dict]                    
+def process_sequences(file_sequences, species, celltype, region, directory, TF):
+    """
+    處理序列，計算核苷酸和基序計數，並將概率保存到文件。
 
+    參數:
+    - file_sequences (list): 序列列表。
+    - species (str): 物種名稱。
+    - celltype (str): 細胞類型。
+    - region (str): 區域。
+    - directory (str): 保存輸出文件的目錄。
+    - TF (str): 轉錄因子名稱。
+    """
+    print('~~ Processing sequences ~~')
+    start_time = time.time()
+    total_cpg, total_chg, total_chh = 0, 0, 0
 
-def read_file(file, species, celltype, region , dir,TF):    
-    print('~~read_file~~') 
-    filestime = time.time()
-    cpg, chg, chh =[0, 0, 0] 
+    mononucleotide_totals = np.zeros(4)  # A, C, G, T
+    dinucleotide_totals = np.zeros(16)  # AA, AC, ..., TT
 
-    monome, dimer = np.zeros(4), np.zeros(16)     
+    with Pool(CPU_COUNT) as pool:
+        results = pool.map(count_nucleotides_and_motifs, file_sequences)
 
-    # stime = time.time()
-    # with open(file, 'r') as file:
-    #     file = file.readlines()
-    #     etime = time.time()            
-    #     print('read file finish cost ', (etime-stime)/60,' min \n' )
+    for result in results:
+        if isinstance(result, int):
+            continue  # 跳過無效結果
 
-    with Pool(cpu_count) as pool:
-            # res = pool.map(calc,[file[seq] for seq in range(len(file))])
-            res = pool.map(calc,file)
-                
-    for i in res:
-        if isinstance(i, int):
-            continue
+        cpg, chg, chh, mononucleotide_counts, dinucleotide_counts = result
 
-        cpg += i[0]
-        chg += i[1]
-        chh += i[2]
+        total_cpg += cpg
+        total_chg += chg
+        total_chh += chh
 
-        monome += np.array(list(i[3].values()))
-        dimer += np.array(list(i[4].values()))
+        mononucleotide_totals += np.array([mononucleotide_counts['A'], mononucleotide_counts['C'],
+                                           mononucleotide_counts['G'], mononucleotide_counts['T']])
+        dinucleotide_totals += np.array([dinucleotide_counts[dinuc] for dinuc in sorted(dinucleotide_counts.keys())])
 
-    sum = cpg + chh + chg
-    
-    cpg_chg_chh = ['{:.4f}'.format(cpg/sum), '{:.4f}'.format(chg/sum), '{:.4f}'.format(chh/sum)]
-    # print('CpG', cpg,round(cpg /sum,4))
-    # print('CHG',chg,round(chg /sum,4))
-    # print('CHH',chh,round(chh /sum,4))  
+    total_motifs = total_cpg + total_chg + total_chh
+    cpg_chg_chh_probs = [f'{total_cpg / total_motifs:.4f}', f'{total_chg / total_motifs:.4f}',
+                         f'{total_chh / total_motifs:.4f}']
 
-    # print('monome',monome.tolist())
-    # print('dimer',dimer.tolist())
-    sum =  reduce(lambda x,y : x + y, monome.tolist())
-    monome_prob = list(map(lambda x : round( x / sum, 4), monome.tolist()))
-    # print(monome_prob)
-    for monome in  monome_prob:
-       
-        cpg_chg_chh.append('{:.4f}'.format(monome))
+    total_mono = mononucleotide_totals.sum()
+    mononucleotide_probs = (mononucleotide_totals / total_mono).round(4)
+    for prob in mononucleotide_probs:
+        cpg_chg_chh_probs.append(f'{prob:.4f}')
 
-
-    dimer_ = dimer.tolist()
-    m = []
+    dinucleotide_list = dinucleotide_totals.tolist()
+    m_factors = []
     index = 0
-    for i in range(0, len(dimer_ ), 4):
-        temp = dimer_ [i : i + 4]
-        sum = reduce(lambda x, y : x + y, temp)
-        sum = monome_prob[index] / sum
-        for i in range(4):
-            m.append(sum)
+    for i in range(0, len(dinucleotide_list), 4):
+        dinuc_group = dinucleotide_list[i:i + 4]
+        group_sum = sum(dinuc_group)
+        if group_sum == 0:
+            m_factor = 0
+        else:
+            m_factor = mononucleotide_probs[index] / group_sum
+        m_factors.extend([m_factor] * 4)
         index += 1
-    m = np.array(m)    
-    dimer_prob = np.multiply(dimer, m)
-    etime = time.time()  
-    # print(dimer_prob)
 
-    for dimer in  dimer_prob:
-        cpg_chg_chh.append('{:.4f}'.format(dimer))
+    m_factors = np.array(m_factors)
+    dinucleotide_probs = (dinucleotide_totals * m_factors).round(4)
+    for prob in dinucleotide_probs:
+        cpg_chg_chh_probs.append(f'{prob:.4f}')
 
-    print('calc finish..', (etime-filestime)/ 60,' min' ) 
-    df = pd.DataFrame(cpg_chg_chh, columns=[dir],index=[ 'CpG', 'CHG', 'CHH', 'A', 'C', 'G', 'T', 'AA', 'AC', 'AG', 'AT', 'CA', 'CC', 'CG', 'CT', 'GA', 'GC', 'GG', 'GT', 'TA', 'TC', 'TG', 'TT'])
-    # print(df)
-    path = dir_path + '/../../Background_probability/'+ dir + '/'+ species + '_' + TF + '_' + celltype +'_'+region +'_probability.txt'
-    df.to_csv(path, sep='\t')
-    
+    elapsed_time = time.time() - start_time
+    print(f'Calculation finished in {elapsed_time / 60:.2f} minutes.')
 
-def  read_big_file(big_fileA, big_fileB):
+    index_labels = ['CpG', 'CHG', 'CHH', 'A', 'C', 'G', 'T'] + sorted(dinucleotide_counts.keys())
+    df = pd.DataFrame(cpg_chg_chh_probs, columns=[directory], index=index_labels)
 
+    output_path = os.path.join(dir_path, '../../Background_probability', directory,
+                               f'{species}_{TF}_{celltype}_{region}_probability.txt')
+    df.to_csv(output_path, sep='\t')
+
+
+def read_big_file(big_fileA, big_fileB):
+    """
+    生成器函數，逐行讀取兩個大文件。
+
+    參數:
+    - big_fileA (file object): 第一個文件對象。
+    - big_fileB (file object): 第二個文件對象。
+
+    產出:
+    - 每次產出兩個文件對應的行，作為元組。
+    """
     while True:
         data_chunk_from_fileA = big_fileA.readline()
         data_chunk_from_fileB = big_fileB.readline()
         if data_chunk_from_fileA == '' or data_chunk_from_fileB == '':
             break
-        
-        yield data_chunk_from_fileA.replace('\n',''),data_chunk_from_fileB.replace('\n','')
+
+        yield data_chunk_from_fileA.strip(), data_chunk_from_fileB.strip()
 
 
 def calc_mlevel(fileA, fileB):
-    print('~~calc_mlevel~~')
-    total, count, mismatch = 0, 0, 0
-    length = 900000000
+    """
+    計算甲基化水平。
+
+    參數:
+    - fileA (str): 第一個文件的路徑。
+    - fileB (str): 第二個文件的路徑。
+
+    返回:
+    - 甲基化概率（str），格式化為小數點後四位。
+    """
+    print('~~ Calculating methylation level ~~')
+    total, count = 0, 0
+    length = 900000000  # 讀取的最大行數
     s_time = time.time()
-    with Pool(cpu_count-2) as pool:
+    with Pool(CPU_COUNT - 2) as pool:
         with open(fileA, 'r') as big_fileA, open(fileB, 'r') as big_fileB:
             for wgbs_from_fileA, wgbs_from_fileB in itertools.islice(read_big_file(big_fileA, big_fileB), length):
-                wgbs_from_fileA, wgbs_from_fileB = wgbs_from_fileA.split('\t'), wgbs_from_fileB.split('\t')
+                wgbs_from_fileA = wgbs_from_fileA.split('\t')
+                wgbs_from_fileB = wgbs_from_fileB.split('\t')
                 try:
-                    if int(wgbs_from_fileA[-2]) < 4 and int(wgbs_from_fileB[-2]) < 4 :
+                    reads_A = int(wgbs_from_fileA[-2])
+                    reads_B = int(wgbs_from_fileB[-2])
+                    meth_A = int(wgbs_from_fileA[-1]) / 100
+                    meth_B = int(wgbs_from_fileB[-1]) / 100
+
+                    if reads_A < 4 and reads_B < 4:
                         continue
-                    elif (wgbs_from_fileA[-2]) == '0':
-                        total += int(wgbs_from_fileB[-1])/100 
+                    elif reads_A == 0:
+                        total += meth_B
                         count += 1
-                    elif int(wgbs_from_fileB[-2]) == '0':   
-                        total += int(wgbs_from_fileA[-1])/100
+                    elif reads_B == 0:
+                        total += meth_A
                         count += 1
                     else:
-                        read_A = 4 if int(wgbs_from_fileA[-2]) >= 4 else int(wgbs_from_fileA[-2])
-                        read_B = 4 if int(wgbs_from_fileB[-2]) >= 4 else int(wgbs_from_fileB[-2])
-                        total += ((int(wgbs_from_fileA[-1])*read_A+ int(wgbs_from_fileB[-1])*read_B)/100) / (read_A+read_B)
+                        read_A = min(reads_A, 4)
+                        read_B = min(reads_B, 4)
+                        weighted_meth = (meth_A * read_A + meth_B * read_B) / (read_A + read_B)
+                        total += weighted_meth
                         count += 1
                 except:
                     pass
-        
+
             pool.close()
             pool.join()
-    
-    
-    end =  time.time()
-    print('花費時間：', (end - s_time)/60,'min') 
-    print('m_prob:',total /count)
-    print('mismatch',mismatch,'\n')
-    return '{:.4f}'.format(total /count)
+
+    end = time.time()
+    print('耗費時間：', (end - s_time) / 60, 'min')
+    print('甲基化概率：', total / count, '\n')
+    return f'{total / count:.4f}'
 
 
+def calculate_methylation_level(tfbs_bed, wgbs_files, species_name, celltype, region, directory, TF):
+    """
+    計算鄰近區域的甲基化水平。
 
-def culc_mlevel(tfbs_bed, wgbs_file, speciesname, celltype, region, dir, TF):
-    print('~~culc_mlevel neighbor~~')
+    參數:
+    - tfbs_bed (BedTool): TFBS的BedTool對象。
+    - wgbs_files (list): WGBS文件列表，每個元素是一個包含兩個文件路徑的元組。
+    - species_name (str): 物種名稱。
+    - celltype (str): 細胞類型。
+    - region (str): 區域。
+    - directory (str): 目錄名稱。
+    - TF (str): 轉錄因子名稱。
+    """
+    print('~~ Calculating methylation level for neighbor ~~')
     TFBSs = tfbs_bed
-    name = ['CG', 'CHG', 'CHH'] 
+    names = ['CG', 'CHG', 'CHH']
     total = []
     count = 0
-    for file in wgbs_file:
+    for files in wgbs_files:
         start = time.time()
-        wgbs = pybedtools.BedTool(file[0])
-        wgbs_tfbs_A = wgbs.intersect(TFBSs, wa = True)
-        wgbs_tfbs_A.sort()
-        wgbs_tfbs_A = pd.DataFrame(wgbs_tfbs_A)
-        path_name_A = dir_path +  "/../temp/" + '/' + celltype + '_WGBS_'  + name[count] + "_" + dir + "_region_1.bed"
-        wgbs_tfbs_A.to_csv(path_name_A , sep = '\t', index = False, header = False) 
+        wgbs = pybedtools.BedTool(files[0])
+        wgbs_tfbs_A = wgbs.intersect(TFBSs, wa=True)
+        wgbs_tfbs_A = wgbs_tfbs_A.sort()
+        wgbs_tfbs_A_df = pd.DataFrame(wgbs_tfbs_A)
+        path_name_A = os.path.join(dir_path, "../temp",
+                                   f"{celltype}_WGBS_{names[count]}_{directory}_region_1.bed")
+        wgbs_tfbs_A_df.to_csv(path_name_A, sep='\t', index=False, header=False)
         end = time.time()
-        print(name[count] )
-        print('wgbs_tfbs_A intersect finish,cost',(end-start)//60,'min')
-    
-        start = time.time()   
-        wgbs = pybedtools.BedTool(file[1])  
-        wgbs_tfbs_B = wgbs.intersect(TFBSs, wa = True) 
-        wgbs_tfbs_B.sort()
-        wgbs_tfbs_B = pd.DataFrame(wgbs_tfbs_B)
-        path_name_B = dir_path +  "/../temp/" + '/' + celltype + '_WGBS_'  + name[count] + "_" + dir+"_region_2.bed"
-        wgbs_tfbs_B.to_csv(path_name_B, sep = '\t', index = False, header = False) 
+        print(names[count])
+        print('wgbs_tfbs_A intersect finished, cost', (end - start) // 60, 'min')
+
+        start = time.time()
+        wgbs = pybedtools.BedTool(files[1])
+        wgbs_tfbs_B = wgbs.intersect(TFBSs, wa=True)
+        wgbs_tfbs_B = wgbs_tfbs_B.sort()
+        wgbs_tfbs_B_df = pd.DataFrame(wgbs_tfbs_B)
+        path_name_B = os.path.join(dir_path, "../temp",
+                                   f"{celltype}_WGBS_{names[count]}_{directory}_region_2.bed")
+        wgbs_tfbs_B_df.to_csv(path_name_B, sep='\t', index=False, header=False)
         end = time.time()
-        print('wgbs_tfbs_B intersect finish,cost',(end-start)//60,'min')
-    
+        print('wgbs_tfbs_B intersect finished, cost', (end - start) // 60, 'min')
 
         result = calc_mlevel(path_name_A, path_name_B)
         total.append(result)
         count += 1
-        
-       
+
+    df = pd.DataFrame(total, columns=[directory], index=['mCG', 'mCHG', 'mCHH'])
+    print('~~ Saving results ~~')
+    output_path = os.path.join(dir_path, '../../Background_probability', directory,
+                               f'{species_name}_{TF}_{celltype}_{region}_methyl_probability.txt')
+    df.to_csv(output_path, sep='\t', float_format='%.4f')
+    print('~~ Results saved ~~')
 
 
+def promoter(tfbs_bed, species, wgbs_files, celltype, region, TF=None):
+    """
+    處理啟動子區域的背景概率和甲基化水平。
 
-    df = pd.DataFrame(total, columns=[dir],index=['mCG','mCHG', 'mCHH' ])
-    print('～～存檔中~~')
-    path = dir_path + '/../../Background_probability/' + dir + '/'+ speciesname + '_' + TF + '_'+ celltype +'_' + region +'_methyl_probability.txt'
-    df.to_csv(path, sep='\t', float_format = '%.4f')    
-    print('～～存好了~~')
+    參數:
+    - tfbs_bed (tuple): TFBS的BedTool對象和其他信息。
+    - species (str): 物種名稱。
+    - wgbs_files (list): WGBS文件列表。
+    - celltype (str): 細胞類型。
+    - region (str): 區域。
+    - TF (str): 轉錄因子名稱。
 
-
-
-def promoter(tfbs_bed, species, wgbs_file, celltype, region):
-    tfbs_bed = modify_bed(tfbs_bed,50)
-    fasta = pybedtools.BedTool(dir_path + '/../genome/'+species+'.fa')
-    tfbss_fa  = tfbs_bed[1].sequence(fi = fasta,s=True)
-    tfbss_fasta = open(tfbss_fa.seqfn).readlines()
-    read_file(tfbss_fasta, species, celltype, region, 'promoter')
-    culc_mlevel(tfbs_bed[1], wgbs_file, species, celltype, 'promoter')
+    返回:
+    - 調用read_bgprob_table的結果。
+    """
+    tfbs_bed = modify_bed(tfbs_bed, 50)
+    fasta = pybedtools.BedTool(os.path.join(dir_path, '../genome', f'{species}.fa'))
+    tfbss_fa = tfbs_bed[1].sequence(fi=fasta, s=True)
+    with open(tfbss_fa.seqfn, 'r') as f:
+        tfbss_fasta = f.readlines()
+    process_sequences(tfbss_fasta, species, celltype, region, 'promoter', TF)
+    calculate_methylation_level(tfbs_bed[1], wgbs_files, species, celltype, 'promoter', 'promoter', TF)
 
     return read_bgprob_table(species, celltype, 'promoter')
 
 
-def neighbor(tfbs_bed, species, wgbs_file, celltype, region, TF):
-    
-    fasta = pybedtools.BedTool(dir_path + '/../genome/'+species+'.fa')
-    tfbss_fa  = tfbs_bed.sequence(fi = fasta,s=True)
-    tfbss_fasta = open(tfbss_fa.seqfn).readlines()
-    read_file(tfbss_fasta, species, celltype, region, 'neighbor',TF)
-    culc_mlevel(tfbs_bed, wgbs_file, species, celltype, region, 'neighbor',TF)
+def neighbor(tfbs_bed, species, wgbs_files, celltype, region, TF):
+    """
+    處理鄰近區域的背景概率和甲基化水平。
 
-    return read_bgprob_table(species, celltype, region,TF)
+    參數:
+    - tfbs_bed (BedTool): TFBS的BedTool對象。
+    - species (str): 物種名稱。
+    - wgbs_files (list): WGBS文件列表。
+    - celltype (str): 細胞類型。
+    - region (str): 區域。
+    - TF (str): 轉錄因子名稱。
 
-     
+    返回:
+    - 調用read_bgprob_table的結果。
+    """
+    fasta = pybedtools.BedTool(os.path.join(dir_path, '../genome', f'{species}.fa'))
+    tfbss_fa = tfbs_bed.sequence(fi=fasta, s=True)
+    with open(tfbss_fa.seqfn, 'r') as f:
+        tfbss_fasta = f.readlines()
+    process_sequences(tfbss_fasta, species, celltype, region, 'neighbor', TF)
+    calculate_methylation_level(tfbs_bed, wgbs_files, species, celltype, region, 'neighbor', TF)
+
+    return read_bgprob_table(species, celltype, region, TF)

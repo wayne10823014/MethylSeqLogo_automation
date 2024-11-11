@@ -286,7 +286,9 @@ def main():
     else:
         print("所有測試通過，輸出正確。")
         logger.info("所有測試通過，輸出正確。")
-
+    logger.info("")
+    logger.info("--------------------------------------------")
+    logger.info("")
 
 if __name__ == '__main__':
     main()
