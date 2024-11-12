@@ -1,1067 +1,955 @@
-import seaborn,math
+import math
 import matplotlib
-matplotlib.use('Agg')   #不顯示plt
+matplotlib.use('Agg')  # 不显示图形界面
 import matplotlib.pyplot as plt
-import matplotlib.patheffects
+import matplotlib.patheffects as patheffects
 from matplotlib.gridspec import GridSpec
 from matplotlib.font_manager import FontProperties
 import matplotlib.patches as patches
 from matplotlib import transforms
+import seaborn as sns
 import numpy as np
 
-
-global COLOR_SCHEME
+# 定义颜色方案
 COLOR_SCHEME = {
-                    'G': 'orange', 
-                    'A': 'green', 
-                    'C': 'deepskyblue', 
-                    'T': 'red'
-                    }
+    'G': 'orange',
+    'A': 'green',
+    'C': 'deepskyblue',
+    'T': 'red'
+}
 
-
-global BAR_COLOR_SCHEME
 BAR_COLOR_SCHEME = {
-                    'CG': 'black', 
-                    'CHG': 'gray', 
-                    'CHH': 'lightgray',
-					 }
-
+    'CG': 'black',
+    'CHG': 'gray',
+    'CHH': 'lightgray',
+}
 
 def set_fig(entropys, logotype, mode, plotlen):
-	"""
-	Set figure size
-	"""
-	
-	Height= None
-	figureheight= None
-	if logotype == 'riverlake':
-		Height= 3.0
-		figureheight= 3.0
-	else:
-		if (mode == 'Methyl'):
-			# Height = math.ceil(max(entropys['Base']))
-			Height= 3.0
-			figureheight= Height + 4.0
-		else:
-			Height= math.ceil(max(entropys['Base']))
-			if Height<= 3.0:
-				Height= 3.0
-			else:
-				Height= Height
-			figureheight= Height
-	fig= plt.figure(figsize = (plotlen + 1, figureheight))
-	# fig.tight_layout()
-	return fig
+    """
+    设置图形大小。
 
+    参数：
+    - entropys (DataFrame): 信息熵数据。
+    - logotype (str): 图形类型。
+    - mode (str): 模式。
+    - plotlen (int): 绘图长度。
 
+    返回：
+    - fig (Figure): Matplotlib 图形对象。
+    """
+    if logotype == 'riverlake':
+        Height = 3.0
+        figureheight = 3.0
+    else:
+        if mode == 'Methyl':
+            Height = 3.0
+            figureheight = Height + 4.0
+        else:
+            Height = max(math.ceil(max(entropys['Base'])), 3.0)
+            figureheight = Height
+    fig = plt.figure(figsize=(plotlen + 1, figureheight))
+    return fig
 
-
-class Scale(matplotlib.patheffects.RendererBase):
-    def __init__(self, sx, sy= None):
-        self._sx= sx
-        self._sy= sy
+class Scale(patheffects.RendererBase):
+    """
+    自定义缩放效果，用于调整文本的大小。
+    """
+    def __init__(self, sx, sy=None):
+        self._sx = sx
+        self._sy = sy
 
     def draw_path(self, renderer, gc, tpath, affine, rgbFace):
-        affine= affine.identity().scale(self._sx, self._sy) + affine
+        affine = affine.identity().scale(self._sx, self._sy) + affine
         renderer.draw_path(gc, tpath, affine, rgbFace)
-	
-class seqLogoPlot:
-	def __init__(self, fig, celltype, four_base_heights, entropys, Cmethyls, Gmethyls, bgpps, dientropys, bg_dientropys_max, bg_dientropys_min, J_bCG, J_bCHG, J_bCHH, Freqs_,mode, plotlen, threshold, TF):
-		self.fig = fig
-		self.celltype = celltype
-		self.base_heights = four_base_heights
-		self.entropys = entropys
-		self.Cmethyls = Cmethyls
-		self.Gmethyls = Gmethyls
-		self.bgpps = bgpps
-		self.dientropys = dientropys
-		self.dientropys = dientropys
-		self.bg_dientropys_max = bg_dientropys_max
-		self.bg_dientropys_min = bg_dientropys_min
-		self.J_bCG = J_bCG
-		self.J_bCHG = J_bCHG
-		self.J_bCHH = J_bCHH
-		self.Freqs_ = Freqs_
-		self.mode = mode
-		self.plotlen = plotlen
-		self.threshold = threshold
-		self.TF = TF
-		print("threshold",threshold)
-        
-		
-	def plotlogo(self, ):
-		
-		# remove axis content	
-		self.fig.clf()
-		self.fig.tight_layout()
-
-		# reset fig size
-		Height = None
-		figureheight = None
-		if (self.mode == 'Methyl'):
-			Height = 3.0
-			figureheight = Height + 4.0
-			# Height = math.ceil(max(self.entropys['Total']))
-			# if Height <= 3.0:
-			# 	Height = 3.0
-			# else:
-			# 	Height = 5.0		
-			# if Height == 3.0:
-			# 	figureheight = Height + 4.0
-			# elif Height == 5.0:
-			# 	figureheight = Height + 6.0 
-		else:
-			Height = math.ceil(max(self.entropys['Base']))
-			if Height <= 3.0:
-				Height = 3.0
-			else:
-				Height = Height
-			figureheight = Height
-		
-		# set subplots if it is 'Methyl' mode
-		if (self.mode == 'Methyl'):
-			gs = GridSpec(
-							3, #row
-							2, #column
-							width_ratios=[self.plotlen + 1, 1], 
-							height_ratios = [3, 6, 3], 
-							wspace = 0.0, 
-							hspace = 0.5,
-							)
-
-			ax1 = plt.subplot(gs[2])
-			ax2 = plt.subplot(gs[3], sharey = ax1)
-			ax3 = plt.subplot(gs[0], sharex = ax1) 
-			ax4 = plt.subplot(gs[1], sharex = ax2)#, sharey = ax3)
-			ax5 = plt.subplot(gs[4], sharex = ax1)
-			ax6 = plt.subplot(gs[5], sharey = ax5)
-
-
-			x_axis = list(range(self.plotlen))
-			ax1.set_xticks(x_axis)
-			ax1.set_xticklabels([str(i+1) for i in x_axis])
-			
-			y_axis = range(int(Height) + 1)
-
-			fontT = FontProperties()
-			fontT.set_size(68)
-			fontT.set_weight('bold')
-			fontT.set_family('monospace')
-
-			fontC = FontProperties()
-			fontC.set_size(66)
-			fontC.set_weight('bold')
-			fontC.set_family('monospace')
-
-			bbox_props = dict(boxstyle = "square, pad = 0.0", fill = 0, lw = 0.0, alpha = 0.5)
-			
-			base_heights = zip(self.base_heights, self.Cmethyls, self.Gmethyls) #[2:motiflen-2]
-			
-			for i, j in enumerate(base_heights):
-				xshift = 0
-				yshift = 0
-				Bottom = 0
-				width = 1
-
-				for (base, score) in j[0]:
-					
-					ax1.bar(
-							x_axis[i], 
-							score,
-							bottom = Bottom,
-							width = width,
-							color = COLOR_SCHEME[base],
-							alpha = 0.0
-							)
-
-					if base in ['C', 'G']:
-						yshift = 1.0
-						txt1 = ax1.text(
-										x_axis[i],
-										Bottom,
-										base,
-										fontproperties = fontC,
-										transform = transforms.offset_copy(
-						           											ax1.transData, 
-						           											fig = self.fig,
-						           											x = -6,
-						           											y = yshift*(score), 
-						           											units = 'points'
-						           										),
-										ha = 'center',
-										va = 'baseline',
-										color = COLOR_SCHEME[base],
-										bbox = bbox_props,
-										zorder = 1,
-										)
-						txt2 = ax1.text(
-										x_axis[i],
-										Bottom,
-										base,
-										fontproperties = fontC,
-										transform = transforms.offset_copy(
-						           											ax1.transData, 
-						           											fig = self.fig,
-						           											x = -6,
-						           											y = yshift*(score), 
-						           											units = 'points'
-						           										),
-										clip_on = True,
-										ha = 'center',
-										va = 'baseline',
-										color = 'black',
-										bbox = bbox_props,
-										zorder = 2,
-										)
-						for txt in [txt1, txt2]:
-							txt.set_path_effects([Scale(1.2, score)])
-
-						# Shading methylation
-						
-						bgMlevel = None
-						foreMlevel = None
-						if base == 'C':
-							bgMlevel = score * (self.Freqs_.iloc[i]['CpG_p'] * self.J_bCG + self.Freqs_.iloc[i]['CHG_p'] * self.J_bCHG + self.Freqs_.iloc[i]['CHH_p'] * self.J_bCHH)
-							foreMlevel = score * (self.Freqs_.iloc[i]['CpG_p'] * j[1][0] + self.Freqs_.iloc[i]['CHG_p'] * j[1][1] + self.Freqs_.iloc[i]['CHH_p'] * j[1][2])
-						elif base == 'G':
-							bgMlevel = score * (self.Freqs_.iloc[i]['CpG_m'] * self.J_bCG + self.Freqs_.iloc[i]['CHG_m'] * self.J_bCHG + self.Freqs_.iloc[i]['CHH_m'] * self.J_bCHH)
-							foreMlevel = score * (self.Freqs_.iloc[i]['CpG_m'] * j[2][0] + self.Freqs_.iloc[i]['CHG_m'] * j[2][1] + self.Freqs_.iloc[i]['CHH_m'] * j[2][2])
-
-						# shading, first patch methylated part and then clip unmethylated							
-						bot = Bottom
-						left = x_axis[i] - 0.5	
-
-						p1 = patches.Rectangle(
-												(left, bot),
-												1.0,
-												foreMlevel,
-												clip_on = True,
-												lw = 0,
-												fill = False
-												)
-
-						ax1.add_patch(p1)
-						txt2.set_clip_path(p1)
-						# print threshold
-						if score >= self.threshold: # thresholding
-							ax1.plot(
-										(left, left+1), 
-										(bot + bgMlevel, bot + bgMlevel),
-										linewidth = 1.0,
-										linestyle = '--',
-										color = 'lightgray',
-										zorder = 3,
-									)
-
-					else:
-						txt1 = ax1.text(
-										x_axis[i],
-										Bottom,
-										base,
-										fontproperties = fontT,
-										ha = 'center',
-										va = 'baseline',
-										color = COLOR_SCHEME[base],
-										bbox = bbox_props
-										)
-						txt1.set_path_effects([Scale(1.0, score)])
-
-					Bottom += score
-
-			# add key to logo
-			fontKey = FontProperties()
-			fontKey.set_size(19)
-			fontKey.set_weight('bold')
-			fontKey.set_family('monospace')
-			ax2top = int(Height)
-			methylkeyori = ax2top - 1.0
-			ax2.set_xlim(0.0, 1.2)
-			ax2.set_ylim(0.0, int(Height))
-			
-			CGC = ax2.text(0.2, methylkeyori + 0.65, 'C', color = 'white', ha = 'center', fontproperties = fontKey,
-						   transform = transforms.offset_copy(
-							           							ax2.transData, 
-							           							fig = self.fig,
-							           							x = 0.0,
-							           							y = 1.5, 
-							           							units = 'points'
-							           										),)
-			CGG = ax2.text(0.5, methylkeyori + 0.65, 'G', color = 'white', ha = 'center', fontproperties = fontKey,
-						   transform = transforms.offset_copy(
-							           							ax2.transData, 
-							           							fig = self.fig,
-							           							x = 0.0,
-							           							y = 1.5, 
-							           							units = 'points'
-							           										),)
-			cgc = ax2.text(0.2, methylkeyori + 0.65, 'C', color = 'black', ha = 'center', fontproperties = fontKey, clip_on = True,
-						   transform = transforms.offset_copy(
-							           							ax2.transData, 
-							           							fig = self.fig,
-							           							x = 0.0,
-							           							y = 1.5, 
-							           							units = 'points'
-							           										),)
-			cgg = ax2.text(0.5, methylkeyori + 0.65, 'G', color = 'black', ha = 'center', fontproperties = fontKey, clip_on = True,
-						   transform = transforms.offset_copy(
-							           							ax2.transData, 
-							           							fig = self.fig,
-							           							x = 0.0,
-							           							y = 1.5, 
-							           							units = 'points'
-							           										),)
-
-			for txt in [CGC, CGG, cgc, cgg]:
-				txt.set_path_effects([matplotlib.patheffects.Stroke(linewidth=2, foreground='black'), matplotlib.patheffects.Normal()])
-				
-
-			p1 = patches.Rectangle(
-									(0.0, methylkeyori + 0.65), 
-									1.0, 
-									self.J_bCG*0.33, # height of the patch
-									clip_on = True,
-									lw = 0,
-									fill = False
-									)					
-			ax2.add_patch(p1)
-			cgc.set_clip_path(p1)
-			cgg.set_clip_path(p1)
-
-			CHGC = ax2.text(0.2, methylkeyori + 0.325, 'C', color = 'white', ha = 'center', fontproperties = fontKey, 
-						   transform = transforms.offset_copy(
-							           							ax2.transData, 
-							           							fig = self.fig,
-							           							x = 0.0,
-							           							y = 1.5, 
-							           							units = 'points'
-							           										),)
-			CHGH = ax2.text(0.5, methylkeyori + 0.325, 'H', color = 'white', ha = 'center', fontproperties = fontKey,
-						   transform = transforms.offset_copy(
-							           							ax2.transData, 
-							           							fig = self.fig,
-							           							x = 0.0,
-							           							y = 1.5, 
-							           							units = 'points'
-							           										),)
-			CHGG = ax2.text(0.8, methylkeyori + 0.325, 'G', color = 'white', ha = 'center', fontproperties = fontKey,
-						   transform = transforms.offset_copy(
-							           							ax2.transData, 
-							           							fig = self.fig,
-							           							x = 0.0,
-							           							y = 1.5, 
-							           							units = 'points'
-							           										),)
-
-			chgc = ax2.text(0.2, methylkeyori + 0.325, 'C', color = 'black', ha = 'center', fontproperties = fontKey, clip_on = True,
-						   transform = transforms.offset_copy(
-							           							ax2.transData, 
-							           							fig = self.fig,
-							           							x = 0.0,
-							           							y = 1.5, 
-							           							units = 'points'
-							           										),)
-			chgh = ax2.text(0.5, methylkeyori + 0.325, 'H', color = 'black', ha = 'center', fontproperties = fontKey, clip_on = True,
-						   transform = transforms.offset_copy(
-							           							ax2.transData, 
-							           							fig = self.fig,
-							           							x = 0.0,
-							           							y = 1.5, 
-							           							units = 'points'
-							           										),)
-			chgg = ax2.text(0.8, methylkeyori + 0.325, 'G', color = 'black', ha = 'center', fontproperties = fontKey, clip_on = True,
-						   transform = transforms.offset_copy(
-							           							ax2.transData, 
-							           							fig = self.fig,
-							           							x = 0.0,
-							           							y = 1.5, 
-							           							units = 'points'
-							           										),)
-
-			for txt in [CHGC, CHGH, CHGG, chgc, chgh, chgg]:
-				txt.set_path_effects([matplotlib.patheffects.Stroke(linewidth=2, foreground='black'), matplotlib.patheffects.Normal()])
-
-			p2 = patches.Rectangle(
-									(0.0, methylkeyori + 0.325), 
-									1.0, 
-									self.J_bCHG*0.33, # height of the patch
-									clip_on = True,
-									lw = 0,
-									fill = False
-									)					
-			ax2.add_patch(p2)
-			chgc.set_clip_path(p2)
-			chgh.set_clip_path(p2)
-			chgg.set_clip_path(p2)
-
-			CHHC = ax2.text(0.2, methylkeyori, 'C', color = 'white', ha = 'center', fontproperties = fontKey, 
-						   transform = transforms.offset_copy(
-							           							ax2.transData, 
-							           							fig = self.fig,
-							           							x = 0.0,
-							           							y = 1.5, 
-							           							units = 'points'
-							           										),)
-			CHHH1 = ax2.text(0.5, methylkeyori, 'H', color = 'white', ha = 'center', fontproperties = fontKey,
-						   transform = transforms.offset_copy(
-							           							ax2.transData, 
-							           							fig = self.fig,
-							           							x = 0.0,
-							           							y = 1.5, 
-							           							units = 'points'
-							           										),)
-			CHHH2 = ax2.text(0.8, methylkeyori, 'H', color = 'white', ha = 'center', fontproperties = fontKey,
-						   transform = transforms.offset_copy(
-							           							ax2.transData, 
-							           							fig = self.fig,
-							           							x = 0.0,
-							           							y = 1.5, 
-							           							units = 'points'
-							           										),)
-
-			chhc = ax2.text(0.2, methylkeyori, 'C', color = 'black', ha = 'center', fontproperties = fontKey, clip_on = True,
-						   transform = transforms.offset_copy(
-							           							ax2.transData, 
-							           							fig = self.fig,
-							           							x = 0.0,
-							           							y = 1.5, 
-							           							units = 'points'
-							           										),)
-			chhh1 = ax2.text(0.5, methylkeyori, 'H', color = 'black', ha = 'center', fontproperties = fontKey, clip_on = True,
-						   transform = transforms.offset_copy(
-							           							ax2.transData, 
-							           							fig = self.fig,
-							           							x = 0.0,
-							           							y = 1.5, 
-							           							units = 'points'
-							           										),)
-			chhh2 = ax2.text(0.8, methylkeyori, 'H', color = 'black', ha = 'center', fontproperties = fontKey, clip_on = True,
-						   transform = transforms.offset_copy(
-							           							ax2.transData, 
-							           							fig = self.fig,
-							           							x = 0.0,
-							           							y = 1.5, 
-							           							units = 'points'
-							           										),)
-
-			for txt in [CHHC, CHHH1, CHHH2, chhc, chhh1, chhh2]:
-				# txt.set_path_effects([Scale(1.0, self.bgpps[nt])])
-				txt.set_path_effects([matplotlib.patheffects.Stroke(linewidth=2, foreground='black'), matplotlib.patheffects.Normal()])
-
-			p3 = patches.Rectangle(
-									(0.0, methylkeyori), 
-									1.0, 
-									self.J_bCHH*0.33, # height of the patch
-									clip_on = True,
-									lw = 0,
-									fill = False
-									)					
-			ax2.add_patch(p3)
-			chhc.set_clip_path(p3)
-			chhh1.set_clip_path(p3)
-			chhh2.set_clip_path(p3)
-
-			# frequency key
-			freqkeyori = ax2top - 3
-
-			bot = freqkeyori + 0.0
-			for nt in sorted(['A', 'C', 'G', 'T'], reverse = True):
-				freq = round(self.bgpps[nt], 4)
-				bar = ax2.bar(0.5, freq, bottom = bot, width = 1.2, color = COLOR_SCHEME[nt], alpha = 0.0)
-				fontKey2 = FontProperties()
-				if nt in ['C', 'G']:
-					fontKey2.set_size(60)
-					fontKey2.set_weight('bold')
-					fontKey2.set_family('monospace')
-					txt1 = ax2.text(
-									0.5, 
-									bot, 
-									nt, 
-									ha = 'center', 
-									va = 'baseline', 
-									fontproperties = fontKey2, 
-									transform = transforms.offset_copy(
-						           											ax2.transData, 
-						           											fig = self.fig,
-						           											x = -5,
-						           											y = 2.0*(self.bgpps[nt]), 
-						           											units = 'points'
-						           										),
-									color = COLOR_SCHEME[nt],
-									zorder = 1,
-									)
-					txt2 = ax2.text(
-									0.5, 
-									bot, 
-									nt, 
-									ha = 'center', 
-									va = 'baseline', 
-									fontproperties = fontKey2, 
-									transform = transforms.offset_copy(
-						           											ax2.transData, 
-						           											fig = self.fig,
-						           											x = -5,
-						           											y = 2.0*(self.bgpps[nt]), 
-						           											units = 'points'
-						           										),
-									color = 'black',
-									clip_on = True,
-									zorder = 2,
-									)
-					for txt in [txt1, txt2]:
-						txt.set_path_effects([Scale(1.2, 2.2*self.bgpps[nt])])
-
-					bgMlevel = self.bgpps['CpG'] * self.J_bCG + self.bgpps['CHG'] * self.J_bCHG + self.bgpps['CHH'] * self.J_bCHH
-					pb = patches.Rectangle(
-											(0.0, bot),
-											1.0,
-											bgMlevel * 2.2 * self.bgpps[nt], # shading methylation level
-											clip_on = True,
-											lw = 0,
-											fill = False
-											)
-
-					ax2.add_patch(pb)
-					txt2.set_clip_path(pb)
-
-					ax2.plot(
-								(0.0, 1.0), # x range
-								(bot + bgMlevel * 2.2 * self.bgpps[nt], bot + bgMlevel * 2.2 * self.bgpps[nt]), # y range
-								linestyle = '--',
-								linewidth = 1,
-								color = 'lightgrey',
-								)
-				else:
-					fontKey2.set_size(62)
-					fontKey2.set_weight('bold')
-					fontKey2.set_family('monospace')
-					txt = ax2.text(
-									0.5, 
-									bot, 
-									nt, 
-									ha = 'center', 
-									va = 'baseline', 
-									fontproperties = fontKey2, 
-									color = COLOR_SCHEME[nt]
-									)
-					txt.set_path_effects([Scale(1.0, 2.2*self.bgpps[nt])])
-				bot = bot + freq*2
-
-			p3 = patches.Rectangle(
-									(-0.1, freqkeyori-0.05), 
-									1.2, 
-									3.1, # height of the patch
-									clip_on = False,
-									lw = 1.5,
-									fill = False
-									)
-			ax2.add_patch(p3)
-			ax2.set_axis_off()
-			ax2.text(	
-						0.5, 
-						-0.5, 
-						'MethylSeqLogo', 
-						ha = 'center', 
-						va = 'bottom',
-						fontsize = 10,
-						weight = 'bold',
-						)
-
-			# plot methylation entropy on top
-			ax3height = None
-			if Height == 3.0:
-				ax3height = 2
-			else:
-				ax3height = 5
-
-			ax3.hlines(0, 0, self.plotlen-1, color = 'blue', linewidth = 0.5)
-
-			ax3.set_ylim(-(ax3height/2), ax3height/2)			
-			ax3_y_axis = [-(int(ax3height/2)), int(0), int(ax3height/2)]
-			ax3.set_yticks(ax3_y_axis)
-			ax3.set_yticklabels([abs(i) for i in ax3_y_axis])
-
-			for i, cent in self.entropys.loc[:, self.entropys.columns.isin(['CpG_p', 'CpG_m', 'CHG_p', 'CHG_m', 'CHH_p', 'CHH_m'])].iterrows():
-				Bottom_p = 0
-				Bottom_m = 0
-				cg_p, cg_m, chg_p, chg_m, chh_p, chh_m = cent
-				
-				ax3.bar(
-						x_axis[i],
-					    cg_p,
-					    bottom = Bottom_p,
-					    width = 0.8,
-					    color = 'blue',
-					    alpha = 0.8,
-					    )
-				Bottom_p += cg_p
-				
-				ax3.bar(
-						x_axis[i],
-					    -cg_m,
-					    bottom = Bottom_m,
-					    width = 0.8,
-					    color = 'blue',
-					    alpha = 0.4,
-					    )
-				Bottom_m -= cg_m
-				
-				ax3.bar(
-						x_axis[i],
-					    chg_p,
-					    bottom = Bottom_p,
-					    width = 0.8,
-					    color = 'lime',
-					    alpha = 0.8,
-					    )
-				Bottom_p += chg_p
-				
-				ax3.bar(
-						x_axis[i],
-					    -chg_m,
-					    bottom = Bottom_m,
-					    width = 0.8,
-					    color = 'lime',
-					    alpha = 0.4,
-					    )
-				Bottom_m -= chg_m
-				
-				ax3.bar(
-						x_axis[i],
-					    chh_p,
-					    bottom = Bottom_p,
-					    width = 0.8,
-					    color = 'red',
-					    alpha = 0.8,
-					    )
-				Bottom_p += chh_p
-				ax3.bar(
-						x_axis[i],
-					    -chh_m,
-					    bottom = Bottom_m,
-					    width = 0.8,
-					    color = 'red',
-					    alpha = 0.4,
-					    )
-				Bottom_m += chh_m
-
-			params = {'mathtext.default': 'regular' }  
-			plt.rcParams.update(params)
-
-			font = FontProperties()
-			font.set_size(12)
-			font.set_weight('bold')
-			font.set_family('monospace')
-
-			ax3.text(
-						-0.5, 
-						max(ax3_y_axis),
-						r'+ strand',
-						color = 'black',
-						ha = 'left',
-						va = 'center',
-						fontproperties = font,
-				)
-			ax3.text(
-						-0.5,
-						min(ax3_y_axis), 
-						# -ax3height/2 + 0.1,
-						r'- strand',
-						color = 'black',
-						ha = 'left',
-						va = 'center',
-						fontproperties = font,
-				)
-
-			# ax3.text(	
-			# 			0.5, 
-			# 			2.0, 
-			# 			'Methylation entropy', 
-			# 			ha = 'left', 
-			# 			va = 'center',
-			# 			color = 'blue',
-			# 			fontsize = 10,
-			# 			weight = 'bold',
-						# )
-			# ax3.set_ylabel('Bits', fontsize = 18, weight = 'bold')
-
-
-			ax3.spines['top'].set_linewidth(0)
-			ax3.spines['right'].set_linewidth(0)
-			ax3.spines['left'].set_linewidth(3)
-			ax3.spines['bottom'].set_linewidth(0)
-			seaborn.despine(ax = ax3, offset = 2, trim = True)
-			for label in ax3.yaxis.get_ticklabels():
-				label.set_fontweight('bold')
-			ax3.tick_params(
-							direction = 'out', 
-							length = 4, 
-							width = 3, 
-							labelsize = 18,#'x-large', 
-							top = False, 
-							right = False, 
-							bottom = False)
-			ax3.axes.get_xaxis().set_visible(False)
-			# ax3.set_ylabel('Bits', fontsize = 18, weight = 'bold')
-
-			ax4height = None
-			if ax3height == 2:
-				ax4height = 2
-			else:
-				ax4height = 2.5
-
-			ax4.set_ylim(-(ax4height/2), ax4height/2)			
-			ax4_y_axis = [-(ax4height/2), 0, ax4height/2]
-			ax4.set_yticks(ax4_y_axis)
-			ax4.set_yticklabels([int(ax4height/2), abs(0), abs(ax4height/2)])
-			# print ax4_y_axis
-			ax4ori = None
-			if ax4height == 2:
-				ax4ori = 0
-			else:
-				ax4ori = 0.25
-			# CHH
-			p1 = patches.Rectangle(
-									(0.0, ax4ori + 0.1), 
-									0.2, 
-									0.2, # height of the patch
-									clip_on = False,
-									lw = 0,
-									fill = True,
-									color = 'red',
-									alpha = 0.8,
-									)
-			# CHG
-			p2 = patches.Rectangle(
-									(0.0, ax4ori + 0.35), 
-									0.2, 
-									0.2, # height of the patch
-									clip_on = False,
-									lw = 0,
-									fill = True,
-									color = 'lime',
-									alpha = 0.8,
-									)
-			# CpG
-			p3 = patches.Rectangle(
-									(0.0, ax4ori + 0.60), 
-									0.2, 
-									0.2, # height of the patch
-									clip_on = False,
-									lw = 0,
-									fill = True,
-									color = 'blue',
-									alpha = 0.8,
-									)		
-			for p in [p1, p2, p3]:
-				ax4.add_patch(p)
-
-			# set font in ax4 legend
-			# params = {'mathtext.default': 'regular' }  
-			# plt.rcParams.update(params)
-
-			# font = FontProperties()
-			# font.set_size(14)
-			# font.set_weight('bold')
-			# font.set_family('monospace')
-			ax4.text(
-						0.35, 
-						ax4ori + 0.18,
-						r'CHH',
-						color = 'black',
-						ha = 'left',
-						va = 'center',
-						fontproperties = font,
-						)
-			ax4.text(0.35, 
-					ax4ori + 0.43,
-					r'CHG',
-					color = 'black',
-					ha = 'left',
-					va = 'center',
-					fontproperties = font,
-					)
-			ax4.text(0.35, 
-					ax4ori + 0.68,
-					r'CG',
-					color = 'black',
-					ha = 'left',
-					va = 'center',
-					fontproperties = font,
-					)
-
-
-			frame = patches.Rectangle(
-										(-0.1, ax4ori-0.04), 
-										1.4, 
-										0.95, # height of the patch
-										clip_on = False,
-										lw = 1.5,
-										fill = False,
-										)	
-			ax4.add_patch(frame)
-			ax4.set_title('Entropy from:', fontsize = 10, weight = 'bold')
-			ax4.set_axis_off()
-
-			# print self.dientropys
-			# print ([0.5*i for i in list(range(1, plotlen-1))])
-			ax5.set_ylim(-1, 3)
-			ax5.hlines(0, 0, self.plotlen-1, color = 'red', linewidth = 0.3)
-
-			ax5.bar([i + 0.5 for i in list(range(self.plotlen-1))], self.dientropys, linewidth = 2, color = 'red', alpha = 0.6)
-			ax5.hlines(self.bg_dientropys_max, 0, self.plotlen-1, color = 'grey', linewidth = 0.5, linestyle = '--')
-			ax5.hlines(self.bg_dientropys_min, 0, self.plotlen-1, color = 'grey', linewidth = 0.5, linestyle = '--')
-			
-			ax5.set_yticks([-1, 0, 1, 2, 3])
-			ax5.set_yticklabels([abs(i) for i in [-1, 0, 1, 2, 3]])
-			ax5.spines['top'].set_linewidth(0)
-			ax5.spines['right'].set_linewidth(0)
-			ax5.spines['left'].set_linewidth(3)
-			ax5.spines['bottom'].set_linewidth(0)
-
-			seaborn.despine(ax = ax5, offset = 2, trim = True)
-			ax5.tick_params(
-							direction = 'out', 
-							length = 4, 
-							width = 3, 
-							labelsize = 18,#'x-large', 
-							top = False, 
-							right = False, 
-							bottom = False)
-			for label in ax5.yaxis.get_ticklabels():
-				label.set_fontweight('bold')			
-			ax5.axes.get_xaxis().set_visible(False)
-
-			# ax5.text(	
-			# 			0.5, 
-			# 			3.0, 
-			# 			'dimer depleted', 
-			# 			ha = 'left', 
-			# 			va = 'center',
-			# 			color = 'gray',
-			# 			fontsize = 10,
-			# 			weight = 'bold',
-			# 			)
-			# ax5.text(	
-			# 			0.5, 
-			# 			-1.0, 
-			# 			'dimer enriched', 
-			# 			ha = 'left', 
-			# 			va = 'center',
-			# 			color = 'gray',
-			# 			fontsize = 10,
-			# 			weight = 'bold',
-			# 			)
-
-
-			ax5.text(
-						-0.5, 
-						3,
-						r'+ dimer depleted',
-						color = 'black',
-						ha = 'left',
-						va = 'center',
-						fontproperties = font,
-				)
-			ax5.text(
-						-0.5, 
-						-1,
-						r'- dimer enriched',
-						color = 'black',
-						ha = 'left',
-						va = 'center',
-						fontproperties = font,
-				)
-
-			ax6.set_axis_off()
-			# ax6.hlines(0, 0, 1, linewidth = 0.3, color = 'black')
-			# ax6.hlines(self.bg_dientropys_max, 0, 1, linewidth = 0.5, color = 'red')
-			# ax6.hlines(self.bg_dientropys_min, 0, 1, linewidth = 0.5, color = 'red')
-			
-			ax6.text(
-						0.0, 
-						self.bg_dientropys_max,
-						r'max = ' + str(round(self.bg_dientropys_max, 2)),
-						color = 'grey',
-						ha = 'center',
-						va = 'center',
-						alpha = 0.6,
-						fontsize = 10,
-						# fontproperties = font,
-				)	
-			ax6.text(
-						0.0, 
-						self.bg_dientropys_min,
-						r'min = ' + str(round(self.bg_dientropys_min, 2)),
-						color = 'grey',
-						ha = 'center',
-						va = 'center',
-						alpha = 0.6,
-						fontsize = 10,
-						# fontproperties = font,
-				)			
-			# ax6.tick_params(
-			# 					direction = 'out', 
-			# 					length = 0, 
-			# 					width = 3, 
-			# 					labelsize = 18, #'x-large', 
-			# 					top = False, 
-			# 					left = False
-			# 					)
-
-
-			ax1.set_yticks(y_axis)
-			ax1.set_yticklabels([str(int(i)) for i in y_axis])
-			ax1.spines['top'].set_linewidth(0)
-			ax1.spines['right'].set_linewidth(0)
-			ax1.spines['left'].set_linewidth(3)
-			ax1.spines['bottom'].set_linewidth(3)
-			
-			seaborn.despine(ax = ax1, offset = 2, trim = True)
-			for label in ax1.xaxis.get_ticklabels():
-				label.set_fontweight('bold')
-			for label in ax1.yaxis.get_ticklabels():
-				label.set_fontweight('bold')		
-			ax1.tick_params(
-								direction = 'out', 
-								length = 4, 
-								width = 3, 
-								labelsize = 18, #'x-large', 
-								top = False, 
-								right = False
-								)
-			
-			ax1.set_ylabel(
-							'Bits', 
-							fontsize = 18, 
-							weight = 'bold'
-							)
-			ax1.set_title(
-							self.TF,
-							# self.TF + ' $ \cdot $ ' + self.celltype,
-							fontsize = 16, 
-							weight = 'bold'
-							)
-
-			return ax1, ax2, ax3, ax4, ax5
-
-		else:
-			ax1 = self.fig.add_subplot(111)
-
-			x_axis = list(range(self.plotlen))
-			ax1.set_xticks(x_axis)
-			ax1.set_xticklabels([str(i+1) for i in x_axis])
-			
-			y_axis = list(range(int(Height) + 1))
-		
-
-			fontT = FontProperties()
-			fontT.set_size(70)
-			fontT.set_weight('bold')
-			fontT.set_family('monospace')
-
-			fontC = FontProperties()
-			fontC.set_size(68)
-			fontC.set_weight('bold')
-			fontC.set_family('monospace')
-
-			bbox_props = dict(boxstyle = "square, pad = 0.0", fill = 0, lw = 0.0, alpha = 0.5)			
-			# base_heights = zip(self.base_heights, self.Cmethyls, self.Gmethyls)
-			base_heights = zip(self.base_heights, self.Cmethyls, self.Gmethyls)#[2:motiflen-2]
-			for i, j in enumerate(base_heights):
-				xshift = 0
-				yshift = 0
-				Bottom = 0
-				width = 1
-
-				for (base, score) in j[0]:
-					
-					ax1.bar(
-							x_axis[i], 
-							score,
-							bottom = Bottom,
-							width = width,
-							color = COLOR_SCHEME[base],
-							alpha = 0.0
-							)
-
-					if base in ['C', 'G']:
-						yshift = 1.0
-						txt1 = ax1.text(
-										x_axis[i],
-										Bottom,
-										base,
-										fontproperties = fontC,
-										transform = transforms.offset_copy(
-						           											ax1.transData, 
-						           											fig = self.fig,
-						           											x = -6,
-						           											y = yshift*(score), 
-						           											units = 'points'
-						           										),
-										ha = 'center',
-										va = 'baseline',
-										color = COLOR_SCHEME[base],
-										bbox = bbox_props
-										)
-						txt1.set_path_effects([Scale(1.2, score)])
-					else:
-						txt1 = ax1.text(
-										x_axis[i],
-										Bottom,
-										base,
-										fontproperties = fontT,
-										ha = 'center',
-										va = 'baseline',
-										color = COLOR_SCHEME[base],
-										bbox = bbox_props
-										)
-						txt1.set_path_effects([Scale(1.0, score)])
-
-					Bottom += score
-
-
-			
-			ax1.set_yticks(y_axis)
-			ax1.set_yticklabels([str(i) for i in y_axis])
-			ax1.spines['top'].set_linewidth(0)
-			ax1.spines['right'].set_linewidth(0)
-			ax1.spines['left'].set_linewidth(3)
-			ax1.spines['bottom'].set_linewidth(3)
-			
-			seaborn.despine(ax = ax1, offset = 2, trim = True)
-			for label in ax1.xaxis.get_ticklabels():
-				label.set_fontweight('bold')
-			for label in ax1.yaxis.get_ticklabels():
-				label.set_fontweight('bold')		
-			ax1.tick_params(
-								direction = 'out', 
-								length = 4, 
-								width = 3, 
-								labelsize = 16,#'x-large', 
-								top = False, 
-								right = False
-								)
-			
-			ax1.set_ylabel(
-							'Bits', 
-							fontsize = 16, 
-							weight = 'bold'
-							)
-			ax1.set_title(
-							self.TF + ' $ \cdot $ ' + self.celltype,
-							fontsize = 18, 
-							weight = 'bold'
-							)
-			ax1.text(
-						-1.1, 
-						-0.5, 
-						'MethylSeqLogo', 
-						ha = 'center', 
-						va = 'bottom',
-						fontsize = 12,
-						weight = 'bold',
-						)
-			return ax1,
+
+class SeqLogoPlot:
+    """
+    序列标志图绘制类。
+    """
+    def __init__(
+        self, fig, celltype, four_base_heights, entropys, Cmethyls, Gmethyls, bgpps,
+        dientropys, bg_dientropys_max, bg_dientropys_min, J_bCG, J_bCHG, J_bCHH,
+        Freqs_, mode, plotlen, threshold, TF
+    ):
+        self.fig = fig
+        self.celltype = celltype
+        self.base_heights = four_base_heights
+        self.entropys = entropys
+        self.Cmethyls = Cmethyls
+        self.Gmethyls = Gmethyls
+        self.bgpps = bgpps
+        self.dientropys = dientropys
+        self.bg_dientropys_max = bg_dientropys_max
+        self.bg_dientropys_min = bg_dientropys_min
+        self.J_bCG = J_bCG
+        self.J_bCHG = J_bCHG
+        self.J_bCHH = J_bCHH
+        self.Freqs_ = Freqs_
+        self.mode = mode
+        self.plotlen = plotlen
+        self.threshold = threshold
+        self.TF = TF
+        print("Threshold:", threshold)
+
+    def plot_logo(self):
+        """
+        绘制序列标志图。
+        """
+        # 清除图形内容
+        self.fig.clf()
+        self.fig.tight_layout()
+
+        if self.mode == 'Methyl':
+            Height = 3.0
+            figureheight = Height + 4.0
+        else:
+            Height = max(math.ceil(max(self.entropys['Base'])), 3.0)
+            figureheight = Height
+
+        if self.mode == 'Methyl':
+            gs = GridSpec(
+                3,  # 行数
+                2,  # 列数
+                width_ratios=[self.plotlen + 1, 1],
+                height_ratios=[3, 6, 3],
+                wspace=0.0,
+                hspace=0.5,
+            )
+
+            ax1 = plt.subplot(gs[2])
+            ax2 = plt.subplot(gs[3], sharey=ax1)
+            ax3 = plt.subplot(gs[0], sharex=ax1)
+            ax4 = plt.subplot(gs[1], sharex=ax2)
+            ax5 = plt.subplot(gs[4], sharex=ax1)
+            ax6 = plt.subplot(gs[5], sharey=ax5)
+
+            x_axis = list(range(self.plotlen))
+            ax1.set_xticks(x_axis)
+            ax1.set_xticklabels([str(i + 1) for i in x_axis])
+
+            y_axis = range(int(Height) + 1)
+
+            font_T = FontProperties(size=68, weight='bold', family='monospace')
+            font_C = FontProperties(size=66, weight='bold', family='monospace')
+
+            bbox_props = dict(boxstyle="square, pad=0.0", fill=False, lw=0.0, alpha=0.5)
+
+            base_heights = zip(self.base_heights, self.Cmethyls, self.Gmethyls)
+
+            for i, (bases, Cmethyl, Gmethyl) in enumerate(base_heights):
+                Bottom = 0
+                width = 1
+
+                for (base, score) in bases:
+                    ax1.bar(
+                        x_axis[i],
+                        score,
+                        bottom=Bottom,
+                        width=width,
+                        color=COLOR_SCHEME[base],
+                        alpha=0.0
+                    )
+
+                    if base in ['C', 'G']:
+                        yshift = 1.0
+                        txt1 = ax1.text(
+                            x_axis[i],
+                            Bottom,
+                            base,
+                            fontproperties=font_C,
+                            transform=transforms.offset_copy(
+                                ax1.transData,
+                                fig=self.fig,
+                                x=-6,
+                                y=yshift * score,
+                                units='points'
+                            ),
+                            ha='center',
+                            va='baseline',
+                            color=COLOR_SCHEME[base],
+                            bbox=bbox_props,
+                            zorder=1,
+                        )
+                        txt2 = ax1.text(
+                            x_axis[i],
+                            Bottom,
+                            base,
+                            fontproperties=font_C,
+                            transform=transforms.offset_copy(
+                                ax1.transData,
+                                fig=self.fig,
+                                x=-6,
+                                y=yshift * score,
+                                units='points'
+                            ),
+                            clip_on=True,
+                            ha='center',
+                            va='baseline',
+                            color='black',
+                            bbox=bbox_props,
+                            zorder=2,
+                        )
+                        for txt in [txt1, txt2]:
+                            txt.set_path_effects([Scale(1.2, score)])
+
+                        # 计算甲基化水平
+                        if base == 'C':
+                            bgMlevel = score * (
+                                self.Freqs_.iloc[i]['CpG_p'] * self.J_bCG +
+                                self.Freqs_.iloc[i]['CHG_p'] * self.J_bCHG +
+                                self.Freqs_.iloc[i]['CHH_p'] * self.J_bCHH
+                            )
+                            foreMlevel = score * (
+                                self.Freqs_.iloc[i]['CpG_p'] * Cmethyl[0] +
+                                self.Freqs_.iloc[i]['CHG_p'] * Cmethyl[1] +
+                                self.Freqs_.iloc[i]['CHH_p'] * Cmethyl[2]
+                            )
+                        elif base == 'G':
+                            bgMlevel = score * (
+                                self.Freqs_.iloc[i]['CpG_m'] * self.J_bCG +
+                                self.Freqs_.iloc[i]['CHG_m'] * self.J_bCHG +
+                                self.Freqs_.iloc[i]['CHH_m'] * self.J_bCHH
+                            )
+                            foreMlevel = score * (
+                                self.Freqs_.iloc[i]['CpG_m'] * Gmethyl[0] +
+                                self.Freqs_.iloc[i]['CHG_m'] * Gmethyl[1] +
+                                self.Freqs_.iloc[i]['CHH_m'] * Gmethyl[2]
+                            )
+
+                        # 绘制甲基化阴影
+                        bot = Bottom
+                        left = x_axis[i] - 0.5
+
+                        p1 = patches.Rectangle(
+                            (left, bot),
+                            1.0,
+                            foreMlevel,
+                            clip_on=True,
+                            lw=0,
+                            fill=False
+                        )
+
+                        ax1.add_patch(p1)
+                        txt2.set_clip_path(p1)
+
+                        if score >= self.threshold:
+                            ax1.plot(
+                                (left, left + 1),
+                                (bot + bgMlevel, bot + bgMlevel),
+                                linewidth=1.0,
+                                linestyle='--',
+                                color='lightgray',
+                                zorder=3,
+                            )
+                    else:
+                        txt1 = ax1.text(
+                            x_axis[i],
+                            Bottom,
+                            base,
+                            fontproperties=font_T,
+                            ha='center',
+                            va='baseline',
+                            color=COLOR_SCHEME[base],
+                            bbox=bbox_props
+                        )
+                        txt1.set_path_effects([Scale(1.0, score)])
+
+                    Bottom += score
+
+            # 添加图例到 ax2
+            fontKey = FontProperties(size=19, weight='bold', family='monospace')
+            ax2top = int(Height)
+            methylkeyori = ax2top - 1.0
+            ax2.set_xlim(0.0, 1.2)
+            ax2.set_ylim(0.0, int(Height))
+
+            # 绘制 CG 图例
+            CGC = ax2.text(0.2, methylkeyori + 0.65, 'C', color='white', ha='center', fontproperties=fontKey,
+                           transform=transforms.offset_copy(
+                               ax2.transData,
+                               fig=self.fig,
+                               x=0.0,
+                               y=1.5,
+                               units='points'
+                           ))
+            CGG = ax2.text(0.5, methylkeyori + 0.65, 'G', color='white', ha='center', fontproperties=fontKey,
+                           transform=transforms.offset_copy(
+                               ax2.transData,
+                               fig=self.fig,
+                               x=0.0,
+                               y=1.5,
+                               units='points'
+                           ))
+            cgc = ax2.text(0.2, methylkeyori + 0.65, 'C', color='black', ha='center', fontproperties=fontKey,
+                           clip_on=True,
+                           transform=transforms.offset_copy(
+                               ax2.transData,
+                               fig=self.fig,
+                               x=0.0,
+                               y=1.5,
+                               units='points'
+                           ))
+            cgg = ax2.text(0.5, methylkeyori + 0.65, 'G', color='black', ha='center', fontproperties=fontKey,
+                           clip_on=True,
+                           transform=transforms.offset_copy(
+                               ax2.transData,
+                               fig=self.fig,
+                               x=0.0,
+                               y=1.5,
+                               units='points'
+                           ))
+
+            for txt in [CGC, CGG, cgc, cgg]:
+                txt.set_path_effects([patheffects.Stroke(linewidth=2, foreground='black'), patheffects.Normal()])
+
+            p1 = patches.Rectangle(
+                (0.0, methylkeyori + 0.65),
+                1.0,
+                self.J_bCG * 0.33,
+                clip_on=True,
+                lw=0,
+                fill=False
+            )
+            ax2.add_patch(p1)
+            cgc.set_clip_path(p1)
+            cgg.set_clip_path(p1)
+
+            # 绘制 CHG 图例
+            CHGC = ax2.text(0.2, methylkeyori + 0.325, 'C', color='white', ha='center', fontproperties=fontKey,
+                            transform=transforms.offset_copy(
+                                ax2.transData,
+                                fig=self.fig,
+                                x=0.0,
+                                y=1.5,
+                                units='points'
+                            ))
+            CHGH = ax2.text(0.5, methylkeyori + 0.325, 'H', color='white', ha='center', fontproperties=fontKey,
+                            transform=transforms.offset_copy(
+                                ax2.transData,
+                                fig=self.fig,
+                                x=0.0,
+                                y=1.5,
+                                units='points'
+                            ))
+            CHGG = ax2.text(0.8, methylkeyori + 0.325, 'G', color='white', ha='center', fontproperties=fontKey,
+                            transform=transforms.offset_copy(
+                                ax2.transData,
+                                fig=self.fig,
+                                x=0.0,
+                                y=1.5,
+                                units='points'
+                            ))
+
+            chgc = ax2.text(0.2, methylkeyori + 0.325, 'C', color='black', ha='center', fontproperties=fontKey,
+                            clip_on=True,
+                            transform=transforms.offset_copy(
+                                ax2.transData,
+                                fig=self.fig,
+                                x=0.0,
+                                y=1.5,
+                                units='points'
+                            ))
+            chgh = ax2.text(0.5, methylkeyori + 0.325, 'H', color='black', ha='center', fontproperties=fontKey,
+                            clip_on=True,
+                            transform=transforms.offset_copy(
+                                ax2.transData,
+                                fig=self.fig,
+                                x=0.0,
+                                y=1.5,
+                                units='points'
+                            ))
+            chgg = ax2.text(0.8, methylkeyori + 0.325, 'G', color='black', ha='center', fontproperties=fontKey,
+                            clip_on=True,
+                            transform=transforms.offset_copy(
+                                ax2.transData,
+                                fig=self.fig,
+                                x=0.0,
+                                y=1.5,
+                                units='points'
+                            ))
+
+            for txt in [CHGC, CHGH, CHGG, chgc, chgh, chgg]:
+                txt.set_path_effects([patheffects.Stroke(linewidth=2, foreground='black'), patheffects.Normal()])
+
+            p2 = patches.Rectangle(
+                (0.0, methylkeyori + 0.325),
+                1.0,
+                self.J_bCHG * 0.33,
+                clip_on=True,
+                lw=0,
+                fill=False
+            )
+            ax2.add_patch(p2)
+            chgc.set_clip_path(p2)
+            chgh.set_clip_path(p2)
+            chgg.set_clip_path(p2)
+
+            # 绘制 CHH 图例
+            CHHC = ax2.text(0.2, methylkeyori, 'C', color='white', ha='center', fontproperties=fontKey,
+                            transform=transforms.offset_copy(
+                                ax2.transData,
+                                fig=self.fig,
+                                x=0.0,
+                                y=1.5,
+                                units='points'
+                            ))
+            CHHH1 = ax2.text(0.5, methylkeyori, 'H', color='white', ha='center', fontproperties=fontKey,
+                             transform=transforms.offset_copy(
+                                 ax2.transData,
+                                 fig=self.fig,
+                                 x=0.0,
+                                 y=1.5,
+                                 units='points'
+                             ))
+            CHHH2 = ax2.text(0.8, methylkeyori, 'H', color='white', ha='center', fontproperties=fontKey,
+                             transform=transforms.offset_copy(
+                                 ax2.transData,
+                                 fig=self.fig,
+                                 x=0.0,
+                                 y=1.5,
+                                 units='points'
+                             ))
+
+            chhc = ax2.text(0.2, methylkeyori, 'C', color='black', ha='center', fontproperties=fontKey,
+                            clip_on=True,
+                            transform=transforms.offset_copy(
+                                ax2.transData,
+                                fig=self.fig,
+                                x=0.0,
+                                y=1.5,
+                                units='points'
+                            ))
+            chhh1 = ax2.text(0.5, methylkeyori, 'H', color='black', ha='center', fontproperties=fontKey,
+                             clip_on=True,
+                             transform=transforms.offset_copy(
+                                 ax2.transData,
+                                 fig=self.fig,
+                                 x=0.0,
+                                 y=1.5,
+                                 units='points'
+                             ))
+            chhh2 = ax2.text(0.8, methylkeyori, 'H', color='black', ha='center', fontproperties=fontKey,
+                             clip_on=True,
+                             transform=transforms.offset_copy(
+                                 ax2.transData,
+                                 fig=self.fig,
+                                 x=0.0,
+                                 y=1.5,
+                                 units='points'
+                             ))
+
+            for txt in [CHHC, CHHH1, CHHH2, chhc, chhh1, chhh2]:
+                txt.set_path_effects([patheffects.Stroke(linewidth=2, foreground='black'), patheffects.Normal()])
+
+            p3 = patches.Rectangle(
+                (0.0, methylkeyori),
+                1.0,
+                self.J_bCHH * 0.33,
+                clip_on=True,
+                lw=0,
+                fill=False
+            )
+            ax2.add_patch(p3)
+            chhc.set_clip_path(p3)
+            chhh1.set_clip_path(p3)
+            chhh2.set_clip_path(p3)
+
+            # 绘制碱基频率图例
+            freqkeyori = ax2top - 3
+            bot = freqkeyori + 0.0
+            for nt in sorted(['A', 'C', 'G', 'T'], reverse=True):
+                freq = round(self.bgpps[nt], 4)
+                ax2.bar(0.5, freq, bottom=bot, width=1.2, color=COLOR_SCHEME[nt], alpha=0.0)
+                fontKey2 = FontProperties()
+                if nt in ['C', 'G']:
+                    fontKey2.set_size(60)
+                    fontKey2.set_weight('bold')
+                    fontKey2.set_family('monospace')
+                    txt1 = ax2.text(
+                        0.5,
+                        bot,
+                        nt,
+                        ha='center',
+                        va='baseline',
+                        fontproperties=fontKey2,
+                        transform=transforms.offset_copy(
+                            ax2.transData,
+                            fig=self.fig,
+                            x=-5,
+                            y=2.0 * self.bgpps[nt],
+                            units='points'
+                        ),
+                        color=COLOR_SCHEME[nt],
+                        zorder=1,
+                    )
+                    txt2 = ax2.text(
+                        0.5,
+                        bot,
+                        nt,
+                        ha='center',
+                        va='baseline',
+                        fontproperties=fontKey2,
+                        transform=transforms.offset_copy(
+                            ax2.transData,
+                            fig=self.fig,
+                            x=-5,
+                            y=2.0 * self.bgpps[nt],
+                            units='points'
+                        ),
+                        color='black',
+                        clip_on=True,
+                        zorder=2,
+                    )
+                    for txt in [txt1, txt2]:
+                        txt.set_path_effects([Scale(1.2, 2.2 * self.bgpps[nt])])
+
+                    bgMlevel = self.bgpps['CpG'] * self.J_bCG + self.bgpps['CHG'] * self.J_bCHG + self.bgpps['CHH'] * self.J_bCHH
+                    pb = patches.Rectangle(
+                        (0.0, bot),
+                        1.0,
+                        bgMlevel * 2.2 * self.bgpps[nt],
+                        clip_on=True,
+                        lw=0,
+                        fill=False
+                    )
+
+                    ax2.add_patch(pb)
+                    txt2.set_clip_path(pb)
+
+                    ax2.plot(
+                        (0.0, 1.0),
+                        (bot + bgMlevel * 2.2 * self.bgpps[nt], bot + bgMlevel * 2.2 * self.bgpps[nt]),
+                        linestyle='--',
+                        linewidth=1,
+                        color='lightgrey',
+                    )
+                else:
+                    fontKey2.set_size(62)
+                    fontKey2.set_weight('bold')
+                    fontKey2.set_family('monospace')
+                    txt = ax2.text(
+                        0.5,
+                        bot,
+                        nt,
+                        ha='center',
+                        va='baseline',
+                        fontproperties=fontKey2,
+                        color=COLOR_SCHEME[nt]
+                    )
+                    txt.set_path_effects([Scale(1.0, 2.2 * self.bgpps[nt])])
+                bot += freq * 2
+
+            p3 = patches.Rectangle(
+                (-0.1, freqkeyori - 0.05),
+                1.2,
+                3.1,
+                clip_on=False,
+                lw=1.5,
+                fill=False
+            )
+            ax2.add_patch(p3)
+            ax2.set_axis_off()
+            ax2.text(
+                0.5,
+                -0.5,
+                'MethylSeqLogo',
+                ha='center',
+                va='bottom',
+                fontsize=10,
+                weight='bold',
+            )
+
+            # 绘制甲基化信息熵在 ax3
+            ax3height = 2 if Height == 3.0 else 5
+            ax3.hlines(0, 0, self.plotlen - 1, color='blue', linewidth=0.5)
+            ax3.set_ylim(-(ax3height / 2), ax3height / 2)
+            ax3_y_axis = [-(int(ax3height / 2)), 0, int(ax3height / 2)]
+            ax3.set_yticks(ax3_y_axis)
+            ax3.set_yticklabels([abs(i) for i in ax3_y_axis])
+
+            for i, cent in self.entropys.loc[:, self.entropys.columns.isin(
+                    ['CpG_p', 'CpG_m', 'CHG_p', 'CHG_m', 'CHH_p', 'CHH_m'])].iterrows():
+                Bottom_p = 0
+                Bottom_m = 0
+                cg_p, cg_m, chg_p, chg_m, chh_p, chh_m = cent
+
+                ax3.bar(
+                    x_axis[i],
+                    cg_p,
+                    bottom=Bottom_p,
+                    width=0.8,
+                    color='blue',
+                    alpha=0.8,
+                )
+                Bottom_p += cg_p
+
+                ax3.bar(
+                    x_axis[i],
+                    -cg_m,
+                    bottom=Bottom_m,
+                    width=0.8,
+                    color='blue',
+                    alpha=0.4,
+                )
+                Bottom_m -= cg_m
+
+                ax3.bar(
+                    x_axis[i],
+                    chg_p,
+                    bottom=Bottom_p,
+                    width=0.8,
+                    color='lime',
+                    alpha=0.8,
+                )
+                Bottom_p += chg_p
+
+                ax3.bar(
+                    x_axis[i],
+                    -chg_m,
+                    bottom=Bottom_m,
+                    width=0.8,
+                    color='lime',
+                    alpha=0.4,
+                )
+                Bottom_m -= chg_m
+
+                ax3.bar(
+                    x_axis[i],
+                    chh_p,
+                    bottom=Bottom_p,
+                    width=0.8,
+                    color='red',
+                    alpha=0.8,
+                )
+                Bottom_p += chh_p
+
+                ax3.bar(
+                    x_axis[i],
+                    -chh_m,
+                    bottom=Bottom_m,
+                    width=0.8,
+                    color='red',
+                    alpha=0.4,
+                )
+                Bottom_m += chh_m
+
+            font = FontProperties(size=12, weight='bold', family='monospace')
+
+            ax3.text(
+                -0.5,
+                max(ax3_y_axis),
+                r'+ strand',
+                color='black',
+                ha='left',
+                va='center',
+                fontproperties=font,
+            )
+            ax3.text(
+                -0.5,
+                min(ax3_y_axis),
+                r'- strand',
+                color='black',
+                ha='left',
+                va='center',
+                fontproperties=font,
+            )
+
+            ax3.spines['top'].set_linewidth(0)
+            ax3.spines['right'].set_linewidth(0)
+            ax3.spines['left'].set_linewidth(3)
+            ax3.spines['bottom'].set_linewidth(0)
+            sns.despine(ax=ax3, offset=2, trim=True)
+            for label in ax3.yaxis.get_ticklabels():
+                label.set_fontweight('bold')
+            ax3.tick_params(
+                direction='out',
+                length=4,
+                width=3,
+                labelsize=18,
+                top=False,
+                right=False,
+                bottom=False
+            )
+            ax3.axes.get_xaxis().set_visible(False)
+
+            # 绘制甲基化信息熵图例在 ax4
+            ax4height = 2 if ax3height == 2 else 2.5
+            ax4.set_ylim(-(ax4height / 2), ax4height / 2)
+            ax4_y_axis = [-(ax4height / 2), 0, ax4height / 2]
+            ax4.set_yticks(ax4_y_axis)
+            ax4.set_yticklabels([int(ax4height / 2), abs(0), abs(ax4height / 2)])
+
+            ax4ori = 0 if ax4height == 2 else 0.25
+
+            # 绘制 CHH、CHG、CG 图例
+            p1 = patches.Rectangle(
+                (0.0, ax4ori + 0.1),
+                0.2,
+                0.2,
+                clip_on=False,
+                lw=0,
+                fill=True,
+                color='red',
+                alpha=0.8,
+            )
+            p2 = patches.Rectangle(
+                (0.0, ax4ori + 0.35),
+                0.2,
+                0.2,
+                clip_on=False,
+                lw=0,
+                fill=True,
+                color='lime',
+                alpha=0.8,
+            )
+            p3 = patches.Rectangle(
+                (0.0, ax4ori + 0.60),
+                0.2,
+                0.2,
+                clip_on=False,
+                lw=0,
+                fill=True,
+                color='blue',
+                alpha=0.8,
+            )
+            for p in [p1, p2, p3]:
+                ax4.add_patch(p)
+
+            ax4.text(
+                0.35,
+                ax4ori + 0.18,
+                r'CHH',
+                color='black',
+                ha='left',
+                va='center',
+                fontproperties=font,
+            )
+            ax4.text(
+                0.35,
+                ax4ori + 0.43,
+                r'CHG',
+                color='black',
+                ha='left',
+                va='center',
+                fontproperties=font,
+            )
+            ax4.text(
+                0.35,
+                ax4ori + 0.68,
+                r'CG',
+                color='black',
+                ha='left',
+                va='center',
+                fontproperties=font,
+            )
+
+            frame = patches.Rectangle(
+                (-0.1, ax4ori - 0.04),
+                1.4,
+                0.95,
+                clip_on=False,
+                lw=1.5,
+                fill=False,
+            )
+            ax4.add_patch(frame)
+            ax4.set_title('Entropy from:', fontsize=10, weight='bold')
+            ax4.set_axis_off()
+
+            # 绘制二聚体信息熵在 ax5
+            ax5.set_ylim(-1, 3)
+            ax5.hlines(0, 0, self.plotlen - 1, color='red', linewidth=0.3)
+
+            ax5.bar([i + 0.5 for i in list(range(self.plotlen - 1))], self.dientropys, linewidth=2, color='red', alpha=0.6)
+            ax5.hlines(self.bg_dientropys_max, 0, self.plotlen - 1, color='grey', linewidth=0.5, linestyle='--')
+            ax5.hlines(self.bg_dientropys_min, 0, self.plotlen - 1, color='grey', linewidth=0.5, linestyle='--')
+
+            ax5.set_yticks([-1, 0, 1, 2, 3])
+            ax5.set_yticklabels([abs(i) for i in [-1, 0, 1, 2, 3]])
+            ax5.spines['top'].set_linewidth(0)
+            ax5.spines['right'].set_linewidth(0)
+            ax5.spines['left'].set_linewidth(3)
+            ax5.spines['bottom'].set_linewidth(0)
+
+            sns.despine(ax=ax5, offset=2, trim=True)
+            ax5.tick_params(
+                direction='out',
+                length=4,
+                width=3,
+                labelsize=18,
+                top=False,
+                right=False,
+                bottom=False
+            )
+            for label in ax5.yaxis.get_ticklabels():
+                label.set_fontweight('bold')
+            ax5.axes.get_xaxis().set_visible(False)
+
+            ax5.text(
+                -0.5,
+                3,
+                r'+ dimer depleted',
+                color='black',
+                ha='left',
+                va='center',
+                fontproperties=font,
+            )
+            ax5.text(
+                -0.5,
+                -1,
+                r'- dimer enriched',
+                color='black',
+                ha='left',
+                va='center',
+                fontproperties=font,
+            )
+
+            ax6.set_axis_off()
+            ax6.text(
+                0.0,
+                self.bg_dientropys_max,
+                r'max = ' + str(round(self.bg_dientropys_max, 2)),
+                color='grey',
+                ha='center',
+                va='center',
+                alpha=0.6,
+                fontsize=10,
+            )
+            ax6.text(
+                0.0,
+                self.bg_dientropys_min,
+                r'min = ' + str(round(self.bg_dientropys_min, 2)),
+                color='grey',
+                ha='center',
+                va='center',
+                alpha=0.6,
+                fontsize=10,
+            )
+
+            # 设置 ax1 的样式
+            ax1.set_yticks(y_axis)
+            ax1.set_yticklabels([str(int(i)) for i in y_axis])
+            ax1.spines['top'].set_linewidth(0)
+            ax1.spines['right'].set_linewidth(0)
+            ax1.spines['left'].set_linewidth(3)
+            ax1.spines['bottom'].set_linewidth(3)
+
+            sns.despine(ax=ax1, offset=2, trim=True)
+            for label in ax1.xaxis.get_ticklabels():
+                label.set_fontweight('bold')
+            for label in ax1.yaxis.get_ticklabels():
+                label.set_fontweight('bold')
+            ax1.tick_params(
+                direction='out',
+                length=4,
+                width=3,
+                labelsize=18,
+                top=False,
+                right=False
+            )
+
+            ax1.set_ylabel('Bits', fontsize=18, weight='bold')
+            ax1.set_title(self.TF, fontsize=16, weight='bold')
+
+            return ax1, ax2, ax3, ax4, ax5
+
+        else:
+            ax1 = self.fig.add_subplot(111)
+
+            x_axis = list(range(self.plotlen))
+            ax1.set_xticks(x_axis)
+            ax1.set_xticklabels([str(i + 1) for i in x_axis])
+
+            y_axis = range(int(Height) + 1)
+
+            font_T = FontProperties(size=70, weight='bold', family='monospace')
+            font_C = FontProperties(size=68, weight='bold', family='monospace')
+
+            bbox_props = dict(boxstyle="square, pad=0.0", fill=False, lw=0.0, alpha=0.5)
+
+            base_heights = zip(self.base_heights, self.Cmethyls, self.Gmethyls)
+            for i, (bases, _, _) in enumerate(base_heights):
+                Bottom = 0
+                width = 1
+
+                for (base, score) in bases:
+                    ax1.bar(
+                        x_axis[i],
+                        score,
+                        bottom=Bottom,
+                        width=width,
+                        color=COLOR_SCHEME[base],
+                        alpha=0.0
+                    )
+
+                    if base in ['C', 'G']:
+                        yshift = 1.0
+                        txt1 = ax1.text(
+                            x_axis[i],
+                            Bottom,
+                            base,
+                            fontproperties=font_C,
+                            transform=transforms.offset_copy(
+                                ax1.transData,
+                                fig=self.fig,
+                                x=-6,
+                                y=yshift * score,
+                                units='points'
+                            ),
+                            ha='center',
+                            va='baseline',
+                            color=COLOR_SCHEME[base],
+                            bbox=bbox_props
+                        )
+                        txt1.set_path_effects([Scale(1.2, score)])
+                    else:
+                        txt1 = ax1.text(
+                            x_axis[i],
+                            Bottom,
+                            base,
+                            fontproperties=font_T,
+                            ha='center',
+                            va='baseline',
+                            color=COLOR_SCHEME[base],
+                            bbox=bbox_props
+                        )
+                        txt1.set_path_effects([Scale(1.0, score)])
+
+                    Bottom += score
+
+            ax1.set_yticks(y_axis)
+            ax1.set_yticklabels([str(i) for i in y_axis])
+            ax1.spines['top'].set_linewidth(0)
+            ax1.spines['right'].set_linewidth(0)
+            ax1.spines['left'].set_linewidth(3)
+            ax1.spines['bottom'].set_linewidth(3)
+
+            sns.despine(ax=ax1, offset=2, trim=True)
+            for label in ax1.xaxis.get_ticklabels():
+                label.set_fontweight('bold')
+            for label in ax1.yaxis.get_ticklabels():
+                label.set_fontweight('bold')
+            ax1.tick_params(
+                direction='out',
+                length=4,
+                width=3,
+                labelsize=16,
+                top=False,
+                right=False
+            )
+
+            ax1.set_ylabel('Bits', fontsize=16, weight='bold')
+            ax1.set_title(f"{self.TF} $\\cdot$ {self.celltype}", fontsize=18, weight='bold')
+            ax1.text(
+                -1.1,
+                -0.5,
+                'MethylSeqLogo',
+                ha='center',
+                va='bottom',
+                fontsize=12,
+                weight='bold',
+            )
+            return ax1,
+
 
 class riverLake:
 	def __init__(self, fig, tissue, fourletterppm, dippm, Cmethyls, Gmethyls, bgpps, J_bCG, J_bCHG, J_bCHH, Freqs_, mode, plotlen, TF,motiflen):

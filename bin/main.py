@@ -206,10 +206,10 @@ def main():
         dippm = to4basedippm(seqdata, plotlen)
         dientropys, bg_dientropys_max, bg_dientropys_min = twomerBg(bgpps, dippm, plotlen)
         fig = set_fig(entropys, logotype, mode, plotlen)
-        plotobj = seqLogoPlot(fig, celltype, four_base_heights, entropys, Cmethyls, Gmethyls,
+        plotobj = SeqLogoPlot(fig, celltype, four_base_heights, entropys, Cmethyls, Gmethyls,
                               bgpps, dientropys, bg_dientropys_max, bg_dientropys_min,
                               bg_mCG, bg_mCHG, bg_mCHH, Freqs_, mode, plotlen, threshold, TF)
-        plotobj.plotlogo()
+        plotobj.plot_logo()
         logoname_file = f"{logoname}seqlogo.png"
         output_filepath = os.path.join(output_dir, logoname_file)
         plt.savefig(output_filepath, bbox_inches='tight', dpi=600)
@@ -235,9 +235,9 @@ def main():
             entropys = calc_totalEntropy(ppm, bgpps, Cents, lt)
             four_base_heights = calc_perBaseEntropy(entropys, ppm)
             fig = set_fig(entropys)
-            plotobj = seqLogoPlot(fig, celltype, four_base_heights, entropys, Cmethyls, Gmethyls,
+            plotobj = SeqLogoPlot(fig, celltype, four_base_heights, entropys, Cmethyls, Gmethyls,
                                   bgpps, bg_mCG, bg_mCHG, bg_mCHH, Freqs_)
-            plotobj.plotlogo()
+            plotobj.plot_logo()
             logoname_file = f"{logoname}{lt}_seqlogo_bar7.pdf"
             output_filepath = os.path.join(output_dir, logoname_file)
             plt.savefig(output_filepath, bbox_inches='tight', dpi=600)
