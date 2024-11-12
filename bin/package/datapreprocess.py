@@ -1,58 +1,56 @@
-
-import pybedtools 
-from Bio import SeqIO
-import pandas as pd
+import os
+import time
 from collections import defaultdict
-import time,os
+
+import pandas as pd
+import pybedtools
 
 
 def init_list():
+    """初始化一个空列表，用于 defaultdict。"""
     return []
 
-global total
-total = defaultdict(init_list)
-
-global motif_len
-motif_len = 0
-
-dir_path = os.path.dirname(os.path.realpath(__file__))
-path = dir_path + "/../../Output1/"
 
 def flanking_bed(tfbs_of_tf_in_celltype, span1, span2):
-    
+    """
+    生成 TFBS 两侧的序列，用于邻近区域分析。
+
+    参数：
+    - tfbs_of_tf_in_celltype (BedTool): TFBS 在特定细胞类型中的位置信息。
+    - span1 (int): 左侧延伸的碱基数。
+    - span2 (int): 右侧延伸的碱基数。
+
+    返回：
+    - modify_coordinate (BedTool): 修改后的位置信息。
+    """
     modify_coordinate_list = []
-    temp = []
     for tfbs in tfbs_of_tf_in_celltype:
-        temp = []
         tfbs = list(tfbs)
-        temp.append(tfbs[0])
+        # 左侧延伸
         start = str(max(0, int(tfbs[1]) - span1))
-        temp.append(start)
-        temp.append(tfbs[1])
-        modify_coordinate_list.append(temp)
+        modify_coordinate_list.append([tfbs[0], start, tfbs[1]])
+        # 右侧延伸
+        end = str(int(tfbs[2]) + span2)
+        modify_coordinate_list.append([tfbs[0], tfbs[2], end])
 
-        temp = []
-        temp.append(tfbs[0])
-        temp.append(tfbs[2])
-        temp.append(str(int(tfbs[2]) + span2))
-        modify_coordinate_list.append(temp)
-
-    
     gene_df = pd.DataFrame(modify_coordinate_list)
     modify_coordinate = pybedtools.BedTool.from_dataframe(gene_df)
-    # gene_df.to_csv(dir_path + '/temp/' + 'modify_coordinate.bed', sep = '\t', index = False,header=False)
-    print('modify',len(modify_coordinate_list),len(modify_coordinate))
+    print('Modified coordinates:', len(modify_coordinate_list), len(modify_coordinate))
     return modify_coordinate
 
+
 def modify_bed(tfbs_of_tf_in_celltype, span1, span2):
-    """In order to get context give C base,modify coordinate of TFBSs in bed
+    """
+    修改 TFBS 的坐标，延伸左右两侧，用于获取上下文序列。
 
-    #### Args:
-        - tfbs_of_tf_in_celltype(_BedToolObject_) : TFBSs's bed
+    参数：
+    - tfbs_of_tf_in_celltype (BedTool): TFBS 在特定细胞类型中的位置信息。
+    - span1 (int): 左侧延伸的碱基数。
+    - span2 (int): 右侧延伸的碱基数。
 
-    #### Returns:
-        - modify_coordinate_list (_list_) 
-        - modify_coordinate (_BedToolObject_) 
+    返回：
+    - modify_coordinate_list (list): 修改后的坐标列表。
+    - modify_coordinate (BedTool): 修改后的位置信息。
     """
     modify_coordinate_list = []
     for tfbs in tfbs_of_tf_in_celltype:
@@ -62,218 +60,213 @@ def modify_bed(tfbs_of_tf_in_celltype, span1, span2):
         modify_coordinate_list.append(tfbs)
     gene_df = pd.DataFrame(modify_coordinate_list)
     modify_coordinate = pybedtools.BedTool.from_dataframe(gene_df)
-    # gene_df.to_csv(dir_path + '/temp/' + 'modify_coordinate.bed', sep = '\t', index = False,header=False)
-    print('modify',len(modify_coordinate_list),len(modify_coordinate))
+    print('Modified coordinates:', len(modify_coordinate_list), len(modify_coordinate))
     return modify_coordinate_list, modify_coordinate
 
-def get_tfbs(chip_seq_of_celltype, tfbs, species, span1,span2):
-    global motif_len
 
-    """ Find TFBss( motif ) of TF in celltype \n
-    (two bed file must use the same genome assembly)
-
-    #### Args:
-      - chip_seq_of_celltype (_.bed file_) : chip_seq data for TF in celltype
-      - tfbs (_.bed file_) : TFBSs( motif ) of TF 
-
-    #### Returns:
-        - tfbs_of_tf_in_celltype (_BedToolObject_) : intersect output -> TFBSs( motif ) of TF in celltype
-        - modify_bedfile(tfbs_of_tf_in_celltype) (_func_) :
- 
+def get_tfbs(chip_seq_of_celltype, tfbs_file, species, span1, span2):
     """
+    获取特定细胞类型中 TF 的 TFBS（motif）。
 
- 
-    tfbs_site = pybedtools.BedTool(tfbs)  
+    参数：
+    - chip_seq_of_celltype (str): ChIP-seq 数据文件路径。
+    - tfbs_file (str): TFBS（motif）文件路径。
+    - species (str): 物种名称。
+    - span1 (int): 左侧延伸的碱基数。
+    - span2 (int): 右侧延伸的碱基数。
+
+    返回：
+    - tfbs_of_tf_in_celltype (BedTool): 交集得到的 TFBS。
+    - modify_coordinate_list (list): 修改后的坐标列表。
+    - motif_len (int): motif 的长度。
+    """
+    tfbs_site = pybedtools.BedTool(tfbs_file)
     celltype = pybedtools.BedTool(chip_seq_of_celltype)
-    tfbs_of_tf_in_celltype = tfbs_site.intersect(celltype, wa = True)
+    tfbs_of_tf_in_celltype = tfbs_site.intersect(celltype, wa=True)
 
-    fasta = pybedtools.BedTool(dir_path + '/../genome/'+species+'.fa')
-    TFBSs_fasta  = tfbs_of_tf_in_celltype.sequence(fi=fasta,s=True,fo='myc')
-    TFBSs_fasta = open(TFBSs_fasta.seqfn).readlines()
-    txt = []
-    for i in TFBSs_fasta:
-        if i.startswith(">"):
-            key = i.replace('\n','')
-            keys = key.split('(')
-            key = keys[0] 
+    fasta = pybedtools.BedTool(os.path.join(dir_path, '../genome', f'{species}.fa'))
+    TFBSs_fasta = tfbs_of_tf_in_celltype.sequence(fi=fasta, s=True, fo='myc')
+    with open(TFBSs_fasta.seqfn) as f:
+        TFBSs_fasta_lines = f.readlines()
+
+    motif_len = None
+    for line in TFBSs_fasta_lines:
+        if line.startswith(">"):
             continue
-
         else:
-            tfbs = list(i)
-            txt.append(tfbs[:-1])
+            motif_len = len(line.strip())
             break
-    motif_len = len(txt[0])
-    
-    
-    print('\n'+'bedtool intersection finish...')
-    print(len(tfbs_of_tf_in_celltype),' transcription factor binding sites discovered')
 
-    return tfbs_of_tf_in_celltype, modify_bed(tfbs_of_tf_in_celltype, span1, span2)
+    print('\nBedTool intersection finished...')
+    print(f'{len(tfbs_of_tf_in_celltype)} transcription factor binding sites discovered')
+
+    modify_coordinate_list, modify_coordinate = modify_bed(tfbs_of_tf_in_celltype, span1, span2)
+
+    return tfbs_of_tf_in_celltype, modify_coordinate_list, modify_coordinate, motif_len
 
 
-    
-def get_seq(species, seq, tfbs_modify_coordinate, span1, span2):   
-    tfbss = pybedtools.BedTool(tfbs_modify_coordinate)
-    fasta = pybedtools.BedTool(dir_path + '/../genome/'+species+'.fa')
-    tfbss_fa  = tfbss.sequence(fi=fasta,s=True)
-    tfbss_fasta = open(tfbss_fa.seqfn).readlines()
+def get_seq(species, seq_list, tfbs_modify_coordinate, span1, span2, motif_len):
+    """
+    获取序列，并构建 total 数据结构。
+
+    参数：
+    - species (str): 物种名称。
+    - seq_list (list): 修改后的坐标列表。
+    - tfbs_modify_coordinate (BedTool): 修改后的位置信息。
+    - span1 (int): 左侧延伸的碱基数。
+    - span2 (int): 右侧延伸的碱基数。
+    - motif_len (int): motif 的长度。
+
+    返回：
+    - total (defaultdict): 存储序列信息的字典。
+    - seq_file (str): 序列文件路径。
+    """
+    total = defaultdict(init_list)
+    fasta = pybedtools.BedTool(os.path.join(dir_path, '../genome', f'{species}.fa'))
+    tfbss_fa = tfbs_modify_coordinate.sequence(fi=fasta, s=True)
+    with open(tfbss_fa.seqfn) as f:
+        tfbss_fasta = f.readlines()
+
     count = 0
-    for rows in range(len(tfbss_fasta)):
-        if tfbss_fasta[rows].startswith('>'):
-            
-            chr = seq[count][0]
-            tfbsstartpos = int(seq[count][1]) + span1
-            tfbsendpos  = int(seq[count][2]) - span2
-            strand = tfbss_fasta[rows][-3]
-            key = '>'+str(chr)+':'+str(tfbsstartpos)+'-'+str(tfbsendpos)+strand
-    
-            count += 1 
+    for i in range(len(tfbss_fasta)):
+        if tfbss_fasta[i].startswith('>'):
+            chr = seq_list[count][0]
+            tfbsstartpos = int(seq_list[count][1]) + span1
+            tfbsendpos = int(seq_list[count][2]) - span2
+            strand = tfbss_fasta[i][-3]
+            key = f'>{chr}:{tfbsstartpos}-{tfbsendpos}{strand}'
+            count += 1
             continue
-
         else:
-            
-            total[key].append([0]*motif_len)
-            total[key].append([0]*motif_len)
-            total[key].append([0]*motif_len)
-            for base in range(span1, span1+motif_len, 1):
-                if tfbss_fasta[rows][base] not in ["c", "C", "g", "G"]:
-                            continue
+            total[key].append([0] * motif_len)  # ctx
+            total[key].append([0] * motif_len)  # tread
+            total[key].append([0] * motif_len)  # cread
+            sequence = tfbss_fasta[i].strip()
+            for base in range(span1, span1 + motif_len):
+                if sequence[base] not in ["c", "C", "g", "G"]:
+                    continue
                 else:
                     temp = total[key][0]
-                    if strand == '+' and tfbss_fasta[rows][base] in ["c", "C"]:
-                        if tfbss_fasta[rows][base+1] in ["g","G"] :
-                            temp[base-span1] = 'X'
-                        #CHG condition | C base
-                        elif tfbss_fasta[rows][base+2] in ["g","G"]:
-                            temp[base-span1] = 'Y'
-                        #CHH condition | C base    
+                    # 以下根据链的方向和碱基类型标记上下文
+                    if strand == '+' and sequence[base] in ["c", "C"]:
+                        if sequence[base + 1] in ["g", "G"]:
+                            temp[base - span1] = 'X'
+                        elif sequence[base + 2] in ["g", "G"]:
+                            temp[base - span1] = 'Y'
                         else:
-                            temp[base-span1] = 'Z'
-                    elif strand == '+' and tfbss_fasta[rows][base] in ["G", "g"]:
-                        #CG condition | G base
-                        if tfbss_fasta[rows][base-1] in ["c", "C"] :
-                            
-                            temp[base-span1] = 'x'
-                        elif tfbss_fasta[rows][base-2] in ["c", "C"]:
-                            temp[base-span1] = 'y'
+                            temp[base - span1] = 'Z'
+                    elif strand == '+' and sequence[base] in ["G", "g"]:
+                        if sequence[base - 1] in ["c", "C"]:
+                            temp[base - span1] = 'x'
+                        elif sequence[base - 2] in ["c", "C"]:
+                            temp[base - span1] = 'y'
                         else:
-                            temp[base-span1] = 'z'  
-
-                    elif strand == '-' and tfbss_fasta[rows][base] in ["G", "g"]:
-                        #CG condition | C base
-                     
-                        if tfbss_fasta[rows][base-1] in ["c", "C"] :
-                            
-                            temp[base-span1] = 'x'
-                        #CHG condition | C base
-                        elif tfbss_fasta[rows][base-2] in ["c", "C"]:
-                            temp[base-span1] = 'y'
-                        #CHH condition | C base    
+                            temp[base - span1] = 'z'
+                    elif strand == '-' and sequence[base] in ["G", "g"]:
+                        if sequence[base - 1] in ["c", "C"]:
+                            temp[base - span1] = 'x'
+                        elif sequence[base - 2] in ["c", "C"]:
+                            temp[base - span1] = 'y'
                         else:
-                            temp[base-span1] = 'z'
-                    elif strand == '-' and tfbss_fasta[rows][base] in ["c", "C"]:
-                        #CG condition | G base
-                        if tfbss_fasta[rows][base+1] in ["g","G"] :
-                            
-                            temp[base-span1] = 'X'
-                        elif tfbss_fasta[rows][base+2] in ["g","G"]:
-                            temp[base-span1] = 'Y'
+                            temp[base - span1] = 'z'
+                    elif strand == '-' and sequence[base] in ["c", "C"]:
+                        if sequence[base + 1] in ["g", "G"]:
+                            temp[base - span1] = 'X'
+                        elif sequence[base + 2] in ["g", "G"]:
+                            temp[base - span1] = 'Y'
                         else:
-                            temp[base-span1] = 'Z'   
+                            temp[base - span1] = 'Z'
+    return total, tfbss_fa.seqfn
 
-    return tfbss_fa.seqfn
 
-
-def methylread_counter(TFBSFile, WGBSFile):
-    """ Calc  methyl-info in each TFBS \n
-    
-
-    #### Args:
-      - TFBSFile (_.bed file_) : tfbs of TF in celltype
-      - WGBSFile (_.bed file_) : celltype with WGBS 
-    #### Returns:
-        - ctx_dict (_DataFrame_) : methyl-condition when given C/G base in each TFBS (x: CG, y: CHG, z: CHH; upper case: forward strand, lower case: reverse strand)
-        - cread_dict(_DataFrame_)  : read count as cytosine/guanine of C/G (methylated read) in each TFBS
-        - tread_dict(_DataFrame_) : read count as thymine/adenine of T/A (un-methylated read) in each TFBS
- 
+def methylread_counter(TFBSFile, WGBSFile, total):
     """
-    print('\nmethylread_counter starting... ')
+    计算每个 TFBS 的甲基化信息。
+
+    参数：
+    - TFBSFile (BedTool): TFBS 文件。
+    - WGBSFile (list): WGBS 文件列表。
+    - total (defaultdict): 存储序列信息的字典。
+
+    返回：
+    - ctx_dict (DataFrame): 上下文信息。
+    - cread_dict (DataFrame): 甲基化的读计数。
+    - tread_dict (DataFrame): 未甲基化的读计数。
+    """
+    print('\nStarting methylread_counter...')
     count = 1
     TFBSs = TFBSFile
-    WGBSFile = [ filepath for file in  WGBSFile for filepath in file]
-    
+    WGBSFile = [filepath for sublist in WGBSFile for filepath in sublist]
 
     for file in WGBSFile:
         WGBS = pybedtools.BedTool(file)
         start = time.time()
-        Methylation_of_TFBSs= WGBS.intersect(TFBSs, wa = True, wb = True) 
+        Methylation_of_TFBSs = WGBS.intersect(TFBSs, wa=True, wb=True)
         end = time.time()
-        print('intersect finish,cost',(end-start)//60,'min')
+        print(f'Intersection finished, cost {(end - start) / 60:.2f} min')
         start = time.time()
-        readMethylofTFBSsFile= open(Methylation_of_TFBSs.fn).readlines()
-        print(str(count) + ' file finish......')
-    
+        with open(Methylation_of_TFBSs.fn) as f:
+            readMethylofTFBSsFile = f.readlines()
+        print(f'File {count} processing finished...')
 
         for line in readMethylofTFBSsFile:
-            Methylation_information_for_one_row = line.split()
-            tfbsstartpos = Methylation_information_for_one_row[12]
-            tfbsendpos = Methylation_information_for_one_row[13]
-            chr = Methylation_information_for_one_row[0]
-            base_MethylationInfo_pos = Methylation_information_for_one_row[1]
-            capped_read = int(Methylation_information_for_one_row[9])
-            methyl_read = capped_read * int(Methylation_information_for_one_row[10])//100
-            strand = Methylation_information_for_one_row[-1]
-    
-            
-            key = '>'+str(chr)+':'+str(tfbsstartpos)+'-'+str(tfbsendpos)+strand
+            fields = line.strip().split()
+            tfbsstartpos = fields[12]
+            tfbsendpos = fields[13]
+            chr = fields[0]
+            base_MethylationInfo_pos = fields[1]
+            capped_read = int(fields[9])
+            methyl_read = capped_read * int(fields[10]) // 100
+            strand = fields[-1]
+
+            key = f'>{chr}:{tfbsstartpos}-{tfbsendpos}{strand}'
+            if key not in total:
+                continue  # 如果键不在 total 中，跳过
+
             if strand == '+':
-                #tread
+                # tread
                 temp = total[key][1]
-                temp[int(base_MethylationInfo_pos)-int(tfbsstartpos)] = temp[int(base_MethylationInfo_pos)-int(tfbsstartpos)] + capped_read- methyl_read
-    
-                #cread
- 
+                idx = int(base_MethylationInfo_pos) - int(tfbsstartpos)
+                temp[idx] += capped_read - methyl_read
+                # cread
                 temp1 = total[key][2]
-                temp1[int(base_MethylationInfo_pos)-int(tfbsstartpos)] = temp1[int(base_MethylationInfo_pos)-int(tfbsstartpos)] + methyl_read
+                temp1[idx] += methyl_read
             else:
                 try:
-                  temp = total[key][1]
-                  index = int(tfbsstartpos) - int(base_MethylationInfo_pos)-1
-                  temp[index] = temp[index] + capped_read- methyl_read
-    
-                  #cread
-                  temp1 = total[key][2]
-                  temp1[index] = temp1[index] + methyl_read
-                except:
-                  print("Error")
-                  pass
+                    temp = total[key][1]
+                    idx = int(tfbsstartpos) - int(base_MethylationInfo_pos) - 1
+                    temp[idx] += capped_read - methyl_read
+                    # cread
+                    temp1 = total[key][2]
+                    temp1[idx] += methyl_read
+                except IndexError:
+                    print("IndexError occurred.")
+                    pass
         end = time.time()
-
         count += 1
 
     ctx = []
     tread = []
-    cread= []
-    kKey = list(total.keys())
-    print(kKey[0:6])
+    cread = []
     for k in total:
         try:
-
             ctx.append(total[k][0])
             tread.append(total[k][1])
             cread.append(total[k][2])
-        except:
+        except IndexError:
             pass
-    
+
     print("Saving ctx_dict to CSV...")
-    print("Current working directory:", os.getcwd())
     ctx_dict = pd.DataFrame(ctx)
-    ctx_dict.to_csv("MYC_H1_whole_genome_binding_sites_ctx.csv", sep = '\t', index = False) 
     cread_dict = pd.DataFrame(cread)
-    cread_dict.to_csv("MYC_H1_whole_genome_binding_sites_cread.csv", sep = '\t', index = False) 
-
     tread_dict = pd.DataFrame(tread)
-    tread_dict.to_csv("MYC_H1_whole_genome_binding_sites_tread.csv", sep = '\t', index = False) 
-    print("ctx_dict saved.")
-    return ctx_dict,cread_dict, tread_dict
 
+    ctx_dict.to_csv("ctx.csv", sep='\t', index=False)
+    cread_dict.to_csv("cread.csv", sep='\t', index=False)
+    tread_dict.to_csv("tread.csv", sep='\t', index=False)
+    print("ctx_dict saved.")
+    return ctx_dict, cread_dict, tread_dict
+
+
+# 获取当前脚本的目录路径
+dir_path = os.path.dirname(os.path.realpath(__file__))

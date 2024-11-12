@@ -1,0 +1,582 @@
+2024-11-11 17:34:59,413, __main__ - INFO: 開始運行 methylseqlogo 腳本
+2024-11-11 17:34:59,413, __main__ - INFO: 繪制 MYC Methyl Kullback-Liebler logo，物種：human，細胞類型：H1-hESC，區域：50
+2024-11-11 17:34:59,787, __main__ - INFO: 序列數量：2088
+2024-11-11 17:57:45,150, __main__ - INFO: 甲基化讀取計數完成，用時 22 分鐘
+2024-11-11 17:57:45,150, __main__ - INFO: MYC 結合基序長度為 12 bp
+2024-11-11 17:57:45,150, __main__ - WARNING: 用戶定義的繪圖長度超過基序長度
+2024-11-11 17:57:45,150, __main__ - INFO: 繪制 MYC 結合基序，從位置 1 到 12
+2024-11-11 17:58:52,145, __main__ - INFO: 處理鄰近區域
+2024-11-11 17:58:52,146, __main__ - INFO: 找到現有的鄰近背景概率
+2024-11-11 17:58:56,069, __main__ - INFO: MYC_human_H1-hESC_50_Methyl_Kullback-Liebler_seqlogo.png 已保存至 /home/wayne/MethylSeqLogo_automation/bin/../Output1
+2024-11-11 17:58:56,069, __main__ - INFO: 總耗時：23 分 57 秒
+2024-11-11 17:58:56,954, __main__ - INFO: 所有測試通過，輸出正確。
+2024-11-11 17:58:56,954, __main__ - INFO: 
+2024-11-11 17:58:56,954, __main__ - INFO: --------------------------------------------
+2024-11-11 17:58:56,954, __main__ - INFO: 
+2024-11-11 17:59:22,402, __main__ - INFO: 開始運行 methylseqlogo 腳本
+2024-11-11 17:59:22,402, __main__ - INFO: 繪制 MYC Methyl Kullback-Liebler logo，物種：human，細胞類型：H1-hESC，區域：100
+2024-11-11 17:59:23,016, __main__ - INFO: 序列數量：2088
+2024-11-11 18:20:29,897, __main__ - INFO: 甲基化讀取計數完成，用時 21 分鐘
+2024-11-11 18:20:29,916, __main__ - INFO: MYC 結合基序長度為 12 bp
+2024-11-11 18:20:29,916, __main__ - WARNING: 用戶定義的繪圖長度超過基序長度
+2024-11-11 18:20:29,916, __main__ - INFO: 繪制 MYC 結合基序，從位置 1 到 12
+2024-11-11 18:21:35,530, __main__ - INFO: 處理鄰近區域
+2024-11-11 18:21:35,537, __main__ - INFO: 找到現有的鄰近背景概率
+2024-11-11 18:21:38,129, __main__ - INFO: MYC_human_H1-hESC_100_Methyl_Kullback-Liebler_seqlogo.png 已保存至 /home/wayne/MethylSeqLogo_automation/bin/../Output1
+2024-11-11 18:21:38,129, __main__ - INFO: 總耗時：22 分 16 秒
+2024-11-11 18:21:39,829, __main__ - INFO: 所有測試通過，輸出正確。
+2024-11-11 18:21:39,829, __main__ - INFO: 
+2024-11-11 18:21:39,829, __main__ - INFO: --------------------------------------------
+2024-11-11 18:21:39,829, __main__ - INFO: 
+2024-11-11 18:21:54,136, __main__ - INFO: 開始運行 methylseqlogo 腳本
+2024-11-11 18:21:54,136, __main__ - INFO: 繪制 MYC Methyl Kullback-Liebler logo，物種：human，細胞類型：H1-hESC，區域：whole_genome
+2024-11-11 18:21:54,757, __main__ - INFO: 序列數量：2088
+2024-11-11 18:42:43,408, __main__ - INFO: 甲基化讀取計數完成，用時 20 分鐘
+2024-11-11 18:42:43,430, __main__ - INFO: MYC 結合基序長度為 12 bp
+2024-11-11 18:42:43,430, __main__ - WARNING: 用戶定義的繪圖長度超過基序長度
+2024-11-11 18:42:43,430, __main__ - INFO: 繪制 MYC 結合基序，從位置 1 到 12
+2024-11-11 18:43:49,263, __main__ - INFO: MYC_human_H1-hESC_whole_genome_Methyl_Kullback-Liebler_seqlogo.png 已保存至 /home/wayne/MethylSeqLogo_automation/bin/../Output1
+2024-11-11 18:43:49,263, __main__ - INFO: 總耗時：21 分 55 秒
+2024-11-11 18:43:51,739, __main__ - INFO: 所有測試通過，輸出正確。
+2024-11-11 18:43:51,739, __main__ - INFO: 
+2024-11-11 18:43:51,739, __main__ - INFO: --------------------------------------------
+2024-11-11 18:43:51,739, __main__ - INFO: 
+2024-11-11 18:43:58,558, __main__ - INFO: 開始運行 methylseqlogo 腳本
+2024-11-11 18:43:58,558, __main__ - INFO: 繪制 MAX Methyl Kullback-Liebler logo，物種：human，細胞類型：H1-hESC，區域：50
+2024-11-11 18:43:59,021, __main__ - INFO: 序列數量：2662
+2024-11-11 19:04:46,900, __main__ - INFO: 甲基化讀取計數完成，用時 20 分鐘
+2024-11-11 19:04:46,904, __main__ - INFO: MAX 結合基序長度為 10 bp
+2024-11-11 19:04:46,904, __main__ - WARNING: 用戶定義的繪圖長度超過基序長度
+2024-11-11 19:04:46,904, __main__ - INFO: 繪制 MAX 結合基序，從位置 1 到 10
+2024-11-11 19:05:50,808, __main__ - INFO: 處理鄰近區域
+2024-11-11 19:05:50,809, __main__ - INFO: 找到現有的鄰近背景概率
+2024-11-11 19:05:52,637, __main__ - INFO: MAX_human_H1-hESC_50_Methyl_Kullback-Liebler_seqlogo.png 已保存至 /home/wayne/MethylSeqLogo_automation/bin/../Output1
+2024-11-11 19:05:52,637, __main__ - INFO: 總耗時：21 分 54 秒
+2024-11-11 19:05:56,067, __main__ - INFO: 所有測試通過，輸出正確。
+2024-11-11 19:05:56,067, __main__ - INFO: 
+2024-11-11 19:05:56,067, __main__ - INFO: --------------------------------------------
+2024-11-11 19:05:56,067, __main__ - INFO: 
+2024-11-11 19:06:06,496, __main__ - INFO: 開始運行 methylseqlogo 腳本
+2024-11-11 19:06:06,497, __main__ - INFO: 繪制 MAX Methyl Kullback-Liebler logo，物種：human，細胞類型：H1-hESC，區域：100
+2024-11-11 19:06:06,932, __main__ - INFO: 序列數量：2662
+2024-11-11 19:29:01,566, __main__ - INFO: 甲基化讀取計數完成，用時 22 分鐘
+2024-11-11 19:29:01,584, __main__ - INFO: MAX 結合基序長度為 10 bp
+2024-11-11 19:29:01,584, __main__ - WARNING: 用戶定義的繪圖長度超過基序長度
+2024-11-11 19:29:01,584, __main__ - INFO: 繪制 MAX 結合基序，從位置 1 到 10
+2024-11-11 19:30:09,857, __main__ - INFO: 處理鄰近區域
+2024-11-11 19:30:09,857, __main__ - INFO: 找到現有的鄰近背景概率
+2024-11-11 19:30:12,510, __main__ - INFO: MAX_human_H1-hESC_100_Methyl_Kullback-Liebler_seqlogo.png 已保存至 /home/wayne/MethylSeqLogo_automation/bin/../Output1
+2024-11-11 19:30:12,510, __main__ - INFO: 總耗時：24 分 6 秒
+2024-11-11 19:30:16,774, __main__ - INFO: 所有測試通過，輸出正確。
+2024-11-11 19:30:16,774, __main__ - INFO: 
+2024-11-11 19:30:16,774, __main__ - INFO: --------------------------------------------
+2024-11-11 19:30:16,774, __main__ - INFO: 
+2024-11-11 19:30:41,379, __main__ - INFO: 開始運行 methylseqlogo 腳本
+2024-11-11 19:30:41,379, __main__ - INFO: 繪制 MAX Methyl Kullback-Liebler logo，物種：human，細胞類型：H1-hESC，區域：whole_genome
+2024-11-11 19:30:41,946, __main__ - INFO: 序列數量：2662
+2024-11-11 19:52:13,923, __main__ - INFO: 甲基化讀取計數完成，用時 21 分鐘
+2024-11-11 19:52:13,945, __main__ - INFO: MAX 結合基序長度為 10 bp
+2024-11-11 19:52:13,945, __main__ - WARNING: 用戶定義的繪圖長度超過基序長度
+2024-11-11 19:52:13,945, __main__ - INFO: 繪制 MAX 結合基序，從位置 1 到 10
+2024-11-11 19:53:18,880, __main__ - INFO: MAX_human_H1-hESC_whole_genome_Methyl_Kullback-Liebler_seqlogo.png 已保存至 /home/wayne/MethylSeqLogo_automation/bin/../Output1
+2024-11-11 19:53:18,880, __main__ - INFO: 總耗時：22 分 38 秒
+2024-11-11 19:53:23,199, __main__ - INFO: 所有測試通過，輸出正確。
+2024-11-11 19:53:23,199, __main__ - INFO: 
+2024-11-11 19:53:23,199, __main__ - INFO: --------------------------------------------
+2024-11-11 19:53:23,199, __main__ - INFO: 
+2024-11-11 19:53:25,534, __main__ - INFO: 開始運行 methylseqlogo 腳本
+2024-11-11 19:53:25,535, __main__ - INFO: 繪制 SP1 Methyl Kullback-Liebler logo，物種：human，細胞類型：H1-hESC，區域：50
+2024-11-11 19:53:26,218, __main__ - INFO: 序列數量：7782
+2024-11-11 20:15:20,674, __main__ - INFO: 甲基化讀取計數完成，用時 21 分鐘
+2024-11-11 20:15:20,724, __main__ - INFO: SP1 結合基序長度為 11 bp
+2024-11-11 20:15:20,724, __main__ - WARNING: 用戶定義的繪圖長度超過基序長度
+2024-11-11 20:15:20,724, __main__ - INFO: 繪制 SP1 結合基序，從位置 1 到 11
+2024-11-11 20:16:25,574, __main__ - INFO: 處理鄰近區域
+2024-11-11 20:16:25,574, __main__ - INFO: 找到現有的鄰近背景概率
+2024-11-11 20:16:29,104, __main__ - INFO: SP1_human_H1-hESC_50_Methyl_Kullback-Liebler_seqlogo.png 已保存至 /home/wayne/MethylSeqLogo_automation/bin/../Output1
+2024-11-11 20:16:29,104, __main__ - INFO: 總耗時：23 分 4 秒
+2024-11-11 20:16:35,676, __main__ - INFO: 所有測試通過，輸出正確。
+2024-11-11 20:16:35,676, __main__ - INFO: 
+2024-11-11 20:16:35,676, __main__ - INFO: --------------------------------------------
+2024-11-11 20:16:35,676, __main__ - INFO: 
+2024-11-11 20:16:57,620, __main__ - INFO: 開始運行 methylseqlogo 腳本
+2024-11-11 20:16:57,621, __main__ - INFO: 繪制 SP1 Methyl Kullback-Liebler logo，物種：human，細胞類型：H1-hESC，區域：100
+2024-11-11 20:16:58,560, __main__ - INFO: 序列數量：7782
+2024-11-11 20:39:54,177, __main__ - INFO: 甲基化讀取計數完成，用時 22 分鐘
+2024-11-11 20:39:54,244, __main__ - INFO: SP1 結合基序長度為 11 bp
+2024-11-11 20:39:54,244, __main__ - WARNING: 用戶定義的繪圖長度超過基序長度
+2024-11-11 20:39:54,244, __main__ - INFO: 繪制 SP1 結合基序，從位置 1 到 11
+2024-11-11 20:41:03,914, __main__ - INFO: 處理鄰近區域
+2024-11-11 20:41:03,914, __main__ - INFO: 找到現有的鄰近背景概率
+2024-11-11 20:41:07,795, __main__ - INFO: SP1_human_H1-hESC_100_Methyl_Kullback-Liebler_seqlogo.png 已保存至 /home/wayne/MethylSeqLogo_automation/bin/../Output1
+2024-11-11 20:41:07,795, __main__ - INFO: 總耗時：24 分 10 秒
+2024-11-11 20:41:16,780, __main__ - INFO: 所有測試通過，輸出正確。
+2024-11-11 20:41:16,780, __main__ - INFO: 
+2024-11-11 20:41:16,780, __main__ - INFO: --------------------------------------------
+2024-11-11 20:41:16,780, __main__ - INFO: 
+2024-11-11 20:41:40,296, __main__ - INFO: 開始運行 methylseqlogo 腳本
+2024-11-11 20:41:40,296, __main__ - INFO: 繪制 SP1 Methyl Kullback-Liebler logo，物種：human，細胞類型：H1-hESC，區域：whole_genome
+2024-11-11 20:41:41,175, __main__ - INFO: 序列數量：7782
+2024-11-11 21:03:48,502, __main__ - INFO: 甲基化讀取計數完成，用時 22 分鐘
+2024-11-11 21:03:48,522, __main__ - INFO: SP1 結合基序長度為 11 bp
+2024-11-11 21:03:48,522, __main__ - WARNING: 用戶定義的繪圖長度超過基序長度
+2024-11-11 21:03:48,522, __main__ - INFO: 繪制 SP1 結合基序，從位置 1 到 11
+2024-11-11 21:04:56,619, __main__ - INFO: SP1_human_H1-hESC_whole_genome_Methyl_Kullback-Liebler_seqlogo.png 已保存至 /home/wayne/MethylSeqLogo_automation/bin/../Output1
+2024-11-11 21:04:56,619, __main__ - INFO: 總耗時：23 分 16 秒
+2024-11-11 21:05:03,758, __main__ - INFO: 所有測試通過，輸出正確。
+2024-11-11 21:05:03,758, __main__ - INFO: 
+2024-11-11 21:05:03,758, __main__ - INFO: --------------------------------------------
+2024-11-11 21:05:03,758, __main__ - INFO: 
+2024-11-11 21:05:06,794, __main__ - INFO: 開始運行 methylseqlogo 腳本
+2024-11-11 21:05:06,794, __main__ - INFO: 繪制 USF1 Methyl Kullback-Liebler logo，物種：human，細胞類型：H1-hESC，區域：50
+2024-11-11 21:05:09,966, __main__ - WARNING: 解析序列時出錯：Duplicate key 'chr10:69794282-69794396(+)'。正在移除重覆序列。
+2024-11-11 21:05:10,667, __main__ - INFO: 序列數量：70995
+2024-11-11 21:28:23,771, __main__ - INFO: 甲基化讀取計數完成，用時 23 分鐘
+2024-11-11 21:28:23,784, __main__ - INFO: USF1 結合基序長度為 14 bp
+2024-11-11 21:28:23,784, __main__ - WARNING: 用戶定義的繪圖長度超過基序長度
+2024-11-11 21:28:23,784, __main__ - INFO: 繪制 USF1 結合基序，從位置 1 到 14
+2024-11-11 21:29:27,385, __main__ - INFO: 處理鄰近區域
+2024-11-11 21:29:27,385, __main__ - INFO: 找到現有的鄰近背景概率
+2024-11-11 21:29:31,962, __main__ - INFO: USF1_human_H1-hESC_50_Methyl_Kullback-Liebler_seqlogo.png 已保存至 /home/wayne/MethylSeqLogo_automation/bin/../Output1
+2024-11-11 21:29:31,962, __main__ - INFO: 總耗時：24 分 25 秒
+2024-11-11 21:29:45,857, __main__ - INFO: 所有測試通過，輸出正確。
+2024-11-11 21:29:45,858, __main__ - INFO: 
+2024-11-11 21:29:45,858, __main__ - INFO: --------------------------------------------
+2024-11-11 21:29:45,858, __main__ - INFO: 
+2024-11-11 21:29:56,725, __main__ - INFO: 開始運行 methylseqlogo 腳本
+2024-11-11 21:29:56,726, __main__ - INFO: 繪制 USF1 Methyl Kullback-Liebler logo，物種：human，細胞類型：H1-hESC，區域：100
+2024-11-11 21:30:00,061, __main__ - WARNING: 解析序列時出錯：Duplicate key 'chr10:69794232-69794446(+)'。正在移除重覆序列。
+2024-11-11 21:30:00,971, __main__ - INFO: 序列數量：70995
+2024-11-11 21:52:53,172, __main__ - INFO: 甲基化讀取計數完成，用時 22 分鐘
+2024-11-11 21:52:53,191, __main__ - INFO: USF1 結合基序長度為 14 bp
+2024-11-11 21:52:53,191, __main__ - WARNING: 用戶定義的繪圖長度超過基序長度
+2024-11-11 21:52:53,191, __main__ - INFO: 繪制 USF1 結合基序，從位置 1 到 14
+2024-11-11 21:54:00,111, __main__ - INFO: 處理鄰近區域
+2024-11-11 21:54:00,111, __main__ - INFO: 找到現有的鄰近背景概率
+2024-11-11 21:54:07,182, __main__ - INFO: USF1_human_H1-hESC_100_Methyl_Kullback-Liebler_seqlogo.png 已保存至 /home/wayne/MethylSeqLogo_automation/bin/../Output1
+2024-11-11 21:54:07,182, __main__ - INFO: 總耗時：24 分 10 秒
+2024-11-11 21:54:24,711, __main__ - INFO: 所有測試通過，輸出正確。
+2024-11-11 21:54:24,711, __main__ - INFO: 
+2024-11-11 21:54:24,711, __main__ - INFO: --------------------------------------------
+2024-11-11 21:54:24,711, __main__ - INFO: 
+2024-11-11 21:54:45,971, __main__ - INFO: 開始運行 methylseqlogo 腳本
+2024-11-11 21:54:45,971, __main__ - INFO: 繪制 USF1 Methyl Kullback-Liebler logo，物種：human，細胞類型：H1-hESC，區域：whole_genome
+2024-11-11 21:54:49,956, __main__ - WARNING: 解析序列時出錯：Duplicate key 'chr10:69794330-69794348(+)'。正在移除重覆序列。
+2024-11-11 21:54:50,504, __main__ - INFO: 序列數量：65665
+2024-11-11 22:18:05,201, __main__ - INFO: 甲基化讀取計數完成，用時 23 分鐘
+2024-11-11 22:18:05,220, __main__ - INFO: USF1 結合基序長度為 14 bp
+2024-11-11 22:18:05,220, __main__ - WARNING: 用戶定義的繪圖長度超過基序長度
+2024-11-11 22:18:05,220, __main__ - INFO: 繪制 USF1 結合基序，從位置 1 到 14
+2024-11-11 22:19:19,818, __main__ - INFO: USF1_human_H1-hESC_whole_genome_Methyl_Kullback-Liebler_seqlogo.png 已保存至 /home/wayne/MethylSeqLogo_automation/bin/../Output1
+2024-11-11 22:19:19,818, __main__ - INFO: 總耗時：24 分 34 秒
+2024-11-11 22:19:46,358, __main__ - INFO: 所有測試通過，輸出正確。
+2024-11-11 22:19:46,358, __main__ - INFO: 
+2024-11-11 22:19:46,358, __main__ - INFO: --------------------------------------------
+2024-11-11 22:19:46,358, __main__ - INFO: 
+2024-11-11 22:20:11,687, __main__ - INFO: 開始運行 methylseqlogo 腳本
+2024-11-11 22:20:11,688, __main__ - INFO: 繪制 YY1 Methyl Kullback-Liebler logo，物種：human，細胞類型：H1-hESC，區域：50
+2024-11-11 22:20:12,469, __main__ - INFO: 序列數量：6418
+2024-11-11 22:41:12,278, __main__ - INFO: 甲基化讀取計數完成，用時 20 分鐘
+2024-11-11 22:41:12,359, __main__ - INFO: YY1 結合基序長度為 12 bp
+2024-11-11 22:41:12,359, __main__ - WARNING: 用戶定義的繪圖長度超過基序長度
+2024-11-11 22:41:12,359, __main__ - INFO: 繪制 YY1 結合基序，從位置 1 到 12
+2024-11-11 22:42:20,545, __main__ - INFO: 處理鄰近區域
+2024-11-11 22:42:20,546, __main__ - INFO: 找到現有的鄰近背景概率
+2024-11-11 22:42:24,413, __main__ - INFO: YY1_human_H1-hESC_50_Methyl_Kullback-Liebler_seqlogo.png 已保存至 /home/wayne/MethylSeqLogo_automation/bin/../Output1
+2024-11-11 22:42:24,413, __main__ - INFO: 總耗時：22 分 13 秒
+2024-11-11 22:42:48,701, __main__ - INFO: 所有測試通過，輸出正確。
+2024-11-11 22:42:48,701, __main__ - INFO: 
+2024-11-11 22:42:48,701, __main__ - INFO: --------------------------------------------
+2024-11-11 22:42:48,701, __main__ - INFO: 
+2024-11-11 22:43:12,886, __main__ - INFO: 開始運行 methylseqlogo 腳本
+2024-11-11 22:43:12,886, __main__ - INFO: 繪制 YY1 Methyl Kullback-Liebler logo，物種：human，細胞類型：H1-hESC，區域：100
+2024-11-11 22:43:13,699, __main__ - INFO: 序列數量：6418
+2024-11-11 23:04:38,016, __main__ - INFO: 甲基化讀取計數完成，用時 21 分鐘
+2024-11-11 23:04:38,036, __main__ - INFO: YY1 結合基序長度為 12 bp
+2024-11-11 23:04:38,036, __main__ - WARNING: 用戶定義的繪圖長度超過基序長度
+2024-11-11 23:04:38,036, __main__ - INFO: 繪制 YY1 結合基序，從位置 1 到 12
+2024-11-11 23:05:38,814, __main__ - INFO: 處理鄰近區域
+2024-11-11 23:05:38,814, __main__ - INFO: 找到現有的鄰近背景概率
+2024-11-11 23:05:40,463, __main__ - INFO: YY1_human_H1-hESC_100_Methyl_Kullback-Liebler_seqlogo.png 已保存至 /home/wayne/MethylSeqLogo_automation/bin/../Output1
+2024-11-11 23:05:40,463, __main__ - INFO: 總耗時：22 分 28 秒
+2024-11-11 23:06:05,219, __main__ - INFO: 所有測試通過，輸出正確。
+2024-11-11 23:06:05,219, __main__ - INFO: 
+2024-11-11 23:06:05,219, __main__ - INFO: --------------------------------------------
+2024-11-11 23:06:05,219, __main__ - INFO: 
+2024-11-11 23:06:15,017, __main__ - INFO: 開始運行 methylseqlogo 腳本
+2024-11-11 23:06:15,017, __main__ - INFO: 繪制 YY1 Methyl Kullback-Liebler logo，物種：human，細胞類型：H1-hESC，區域：whole_genome
+2024-11-11 23:06:15,722, __main__ - INFO: 序列數量：6418
+2024-11-11 23:27:29,539, __main__ - INFO: 甲基化讀取計數完成，用時 21 分鐘
+2024-11-11 23:27:29,556, __main__ - INFO: YY1 結合基序長度為 12 bp
+2024-11-11 23:27:29,556, __main__ - WARNING: 用戶定義的繪圖長度超過基序長度
+2024-11-11 23:27:29,556, __main__ - INFO: 繪制 YY1 結合基序，從位置 1 到 12
+2024-11-11 23:28:34,126, __main__ - INFO: YY1_human_H1-hESC_whole_genome_Methyl_Kullback-Liebler_seqlogo.png 已保存至 /home/wayne/MethylSeqLogo_automation/bin/../Output1
+2024-11-11 23:28:34,126, __main__ - INFO: 總耗時：22 分 19 秒
+2024-11-11 23:29:01,321, __main__ - INFO: 所有測試通過，輸出正確。
+2024-11-11 23:29:01,321, __main__ - INFO: 
+2024-11-11 23:29:01,321, __main__ - INFO: --------------------------------------------
+2024-11-11 23:29:01,321, __main__ - INFO: 
+2024-11-11 23:29:03,219, __main__ - INFO: 開始運行 methylseqlogo 腳本
+2024-11-11 23:29:03,219, __main__ - INFO: 繪制 EGR1 Methyl Kullback-Liebler logo，物種：human，細胞類型：H1-hESC，區域：50
+2024-11-11 23:29:03,847, __main__ - WARNING: 解析序列時出錯：Duplicate key 'chr12:63843917-63844031(-)'。正在移除重覆序列。
+2024-11-11 23:29:03,979, __main__ - INFO: 序列數量：10561
+2024-11-11 23:50:39,833, __main__ - INFO: 甲基化讀取計數完成，用時 21 分鐘
+2024-11-11 23:50:39,848, __main__ - INFO: EGR1 結合基序長度為 14 bp
+2024-11-11 23:50:39,848, __main__ - WARNING: 用戶定義的繪圖長度超過基序長度
+2024-11-11 23:50:39,848, __main__ - INFO: 繪制 EGR1 結合基序，從位置 1 到 14
+2024-11-11 23:51:45,286, __main__ - INFO: 處理鄰近區域
+2024-11-11 23:51:45,286, __main__ - INFO: 找到現有的鄰近背景概率
+2024-11-11 23:51:49,933, __main__ - INFO: EGR1_human_H1-hESC_50_Methyl_Kullback-Liebler_seqlogo.png 已保存至 /home/wayne/MethylSeqLogo_automation/bin/../Output1
+2024-11-11 23:51:49,933, __main__ - INFO: 總耗時：22 分 47 秒
+2024-11-11 23:52:19,832, __main__ - INFO: 所有測試通過，輸出正確。
+2024-11-11 23:52:19,832, __main__ - INFO: 
+2024-11-11 23:52:19,833, __main__ - INFO: --------------------------------------------
+2024-11-11 23:52:19,833, __main__ - INFO: 
+2024-11-11 23:52:42,992, __main__ - INFO: 開始運行 methylseqlogo 腳本
+2024-11-11 23:52:42,992, __main__ - INFO: 繪制 EGR1 Methyl Kullback-Liebler logo，物種：human，細胞類型：H1-hESC，區域：100
+2024-11-11 23:52:43,958, __main__ - WARNING: 解析序列時出錯：Duplicate key 'chr12:63843867-63844081(-)'。正在移除重覆序列。
+2024-11-11 23:52:44,139, __main__ - INFO: 序列數量：10561
+2024-11-12 00:14:47,507, __main__ - INFO: 甲基化讀取計數完成，用時 22 分鐘
+2024-11-12 00:14:47,521, __main__ - INFO: EGR1 結合基序長度為 14 bp
+2024-11-12 00:14:47,521, __main__ - WARNING: 用戶定義的繪圖長度超過基序長度
+2024-11-12 00:14:47,522, __main__ - INFO: 繪制 EGR1 結合基序，從位置 1 到 14
+2024-11-12 00:15:53,037, __main__ - INFO: 處理鄰近區域
+2024-11-12 00:15:53,037, __main__ - INFO: 找到現有的鄰近背景概率
+2024-11-12 00:15:57,186, __main__ - INFO: EGR1_human_H1-hESC_100_Methyl_Kullback-Liebler_seqlogo.png 已保存至 /home/wayne/MethylSeqLogo_automation/bin/../Output1
+2024-11-12 00:15:57,186, __main__ - INFO: 總耗時：23 分 14 秒
+2024-11-12 00:16:27,610, __main__ - INFO: 所有測試通過，輸出正確。
+2024-11-12 00:16:27,611, __main__ - INFO: 
+2024-11-12 00:16:27,611, __main__ - INFO: --------------------------------------------
+2024-11-12 00:16:27,611, __main__ - INFO: 
+2024-11-12 00:16:50,427, __main__ - INFO: 開始運行 methylseqlogo 腳本
+2024-11-12 00:16:50,428, __main__ - INFO: 繪制 EGR1 Methyl Kullback-Liebler logo，物種：human，細胞類型：H1-hESC，區域：whole_genome
+2024-11-12 00:16:51,320, __main__ - WARNING: 解析序列時出錯：Duplicate key 'chr12:63843965-63843983(-)'。正在移除重覆序列。
+2024-11-12 00:16:51,414, __main__ - INFO: 序列數量：10214
+2024-11-12 00:38:06,081, __main__ - INFO: 甲基化讀取計數完成，用時 21 分鐘
+2024-11-12 00:38:06,099, __main__ - INFO: EGR1 結合基序長度為 14 bp
+2024-11-12 00:38:06,099, __main__ - WARNING: 用戶定義的繪圖長度超過基序長度
+2024-11-12 00:38:06,099, __main__ - INFO: 繪制 EGR1 結合基序，從位置 1 到 14
+2024-11-12 00:39:17,851, __main__ - INFO: EGR1_human_H1-hESC_whole_genome_Methyl_Kullback-Liebler_seqlogo.png 已保存至 /home/wayne/MethylSeqLogo_automation/bin/../Output1
+2024-11-12 00:39:17,851, __main__ - INFO: 總耗時：22 分 27 秒
+2024-11-12 00:39:47,893, __main__ - INFO: 所有測試通過，輸出正確。
+2024-11-12 00:39:47,893, __main__ - INFO: 
+2024-11-12 00:39:47,893, __main__ - INFO: --------------------------------------------
+2024-11-12 00:39:47,893, __main__ - INFO: 
+2024-11-12 00:40:13,016, __main__ - INFO: 開始運行 methylseqlogo 腳本
+2024-11-12 00:40:13,016, __main__ - INFO: 繪制 CEBPB Methyl Kullback-Liebler logo，物種：human，細胞類型：H1-hESC，區域：50
+2024-11-12 00:40:14,273, __main__ - INFO: 序列數量：14352
+2024-11-12 01:01:16,554, __main__ - INFO: 甲基化讀取計數完成，用時 21 分鐘
+2024-11-12 01:01:16,581, __main__ - INFO: CEBPB 結合基序長度為 11 bp
+2024-11-12 01:01:16,581, __main__ - WARNING: 用戶定義的繪圖長度超過基序長度
+2024-11-12 01:01:16,581, __main__ - INFO: 繪制 CEBPB 結合基序，從位置 1 到 11
+2024-11-12 01:02:22,456, __main__ - INFO: 處理鄰近區域
+2024-11-12 01:02:22,457, __main__ - INFO: 找到現有的鄰近背景概率
+2024-11-12 01:02:26,191, __main__ - INFO: CEBPB_human_H1-hESC_50_Methyl_Kullback-Liebler_seqlogo.png 已保存至 /home/wayne/MethylSeqLogo_automation/bin/../Output1
+2024-11-12 01:02:26,192, __main__ - INFO: 總耗時：22 分 13 秒
+2024-11-12 01:02:58,352, __main__ - INFO: 所有測試通過，輸出正確。
+2024-11-12 01:02:58,352, __main__ - INFO: 
+2024-11-12 01:02:58,352, __main__ - INFO: --------------------------------------------
+2024-11-12 01:02:58,352, __main__ - INFO: 
+2024-11-12 01:03:23,199, __main__ - INFO: 開始運行 methylseqlogo 腳本
+2024-11-12 01:03:23,199, __main__ - INFO: 繪制 CEBPB Methyl Kullback-Liebler logo，物種：human，細胞類型：H1-hESC，區域：100
+2024-11-12 01:03:24,536, __main__ - INFO: 序列數量：14352
+2024-11-12 01:24:16,463, __main__ - INFO: 甲基化讀取計數完成，用時 20 分鐘
+2024-11-12 01:24:16,485, __main__ - INFO: CEBPB 結合基序長度為 11 bp
+2024-11-12 01:24:16,485, __main__ - WARNING: 用戶定義的繪圖長度超過基序長度
+2024-11-12 01:24:16,485, __main__ - INFO: 繪制 CEBPB 結合基序，從位置 1 到 11
+2024-11-12 01:25:27,377, __main__ - INFO: 處理鄰近區域
+2024-11-12 01:25:27,377, __main__ - INFO: 找到現有的鄰近背景概率
+2024-11-12 01:25:31,095, __main__ - INFO: CEBPB_human_H1-hESC_100_Methyl_Kullback-Liebler_seqlogo.png 已保存至 /home/wayne/MethylSeqLogo_automation/bin/../Output1
+2024-11-12 01:25:31,095, __main__ - INFO: 總耗時：22 分 8 秒
+2024-11-12 01:26:04,953, __main__ - INFO: 所有測試通過，輸出正確。
+2024-11-12 01:26:04,953, __main__ - INFO: 
+2024-11-12 01:26:04,954, __main__ - INFO: --------------------------------------------
+2024-11-12 01:26:04,954, __main__ - INFO: 
+2024-11-12 01:26:28,918, __main__ - INFO: 開始運行 methylseqlogo 腳本
+2024-11-12 01:26:28,918, __main__ - INFO: 繪制 CEBPB Methyl Kullback-Liebler logo，物種：human，細胞類型：H1-hESC，區域：500
+2024-11-12 01:26:30,686, __main__ - INFO: 序列數量：14352
+2024-11-12 01:47:27,592, __main__ - INFO: 甲基化讀取計數完成，用時 20 分鐘
+2024-11-12 01:47:27,657, __main__ - INFO: CEBPB 結合基序長度為 11 bp
+2024-11-12 01:47:27,657, __main__ - WARNING: 用戶定義的繪圖長度超過基序長度
+2024-11-12 01:47:27,657, __main__ - INFO: 繪制 CEBPB 結合基序，從位置 1 到 11
+2024-11-12 01:48:34,258, __main__ - INFO: 處理鄰近區域
+2024-11-12 01:48:34,258, __main__ - INFO: 找到現有的鄰近背景概率
+2024-11-12 01:48:37,926, __main__ - INFO: CEBPB_human_H1-hESC_500_Methyl_Kullback-Liebler_seqlogo.png 已保存至 /home/wayne/MethylSeqLogo_automation/bin/../Output1
+2024-11-12 01:48:37,926, __main__ - INFO: 總耗時：22 分 9 秒
+2024-11-12 01:49:11,722, __main__ - INFO: 所有測試通過，輸出正確。
+2024-11-12 01:49:11,722, __main__ - INFO: 
+2024-11-12 01:49:11,722, __main__ - INFO: --------------------------------------------
+2024-11-12 01:49:11,722, __main__ - INFO: 
+2024-11-12 01:49:36,339, __main__ - INFO: 開始運行 methylseqlogo 腳本
+2024-11-12 01:49:36,340, __main__ - INFO: 繪制 CEBPB Methyl Kullback-Liebler logo，物種：human，細胞類型：H1-hESC，區域：1000
+2024-11-12 01:49:38,587, __main__ - INFO: 序列數量：14352
+2024-11-12 02:10:36,854, __main__ - INFO: 甲基化讀取計數完成，用時 20 分鐘
+2024-11-12 02:10:36,879, __main__ - INFO: CEBPB 結合基序長度為 11 bp
+2024-11-12 02:10:36,879, __main__ - WARNING: 用戶定義的繪圖長度超過基序長度
+2024-11-12 02:10:36,879, __main__ - INFO: 繪制 CEBPB 結合基序，從位置 1 到 11
+2024-11-12 02:11:43,942, __main__ - INFO: 處理鄰近區域
+2024-11-12 02:11:43,942, __main__ - INFO: 找到現有的鄰近背景概率
+2024-11-12 02:11:47,704, __main__ - INFO: CEBPB_human_H1-hESC_1000_Methyl_Kullback-Liebler_seqlogo.png 已保存至 /home/wayne/MethylSeqLogo_automation/bin/../Output1
+2024-11-12 02:11:47,704, __main__ - INFO: 總耗時：22 分 11 秒
+2024-11-12 02:12:23,538, __main__ - INFO: 所有測試通過，輸出正確。
+2024-11-12 02:12:23,538, __main__ - INFO: 
+2024-11-12 02:12:23,538, __main__ - INFO: --------------------------------------------
+2024-11-12 02:12:23,538, __main__ - INFO: 
+2024-11-12 02:12:47,283, __main__ - INFO: 開始運行 methylseqlogo 腳本
+2024-11-12 02:12:47,283, __main__ - INFO: 繪制 CEBPB Methyl Kullback-Liebler logo，物種：human，細胞類型：H1-hESC，區域：whole_genome
+2024-11-12 02:12:48,549, __main__ - INFO: 序列數量：14352
+2024-11-12 02:33:43,405, __main__ - INFO: 甲基化讀取計數完成，用時 20 分鐘
+2024-11-12 02:33:43,424, __main__ - INFO: CEBPB 結合基序長度為 11 bp
+2024-11-12 02:33:43,424, __main__ - WARNING: 用戶定義的繪圖長度超過基序長度
+2024-11-12 02:33:43,424, __main__ - INFO: 繪制 CEBPB 結合基序，從位置 1 到 11
+2024-11-12 02:34:55,047, __main__ - INFO: CEBPB_human_H1-hESC_whole_genome_Methyl_Kullback-Liebler_seqlogo.png 已保存至 /home/wayne/MethylSeqLogo_automation/bin/../Output1
+2024-11-12 02:34:55,047, __main__ - INFO: 總耗時：22 分 8 秒
+2024-11-12 02:35:32,376, __main__ - INFO: 所有測試通過，輸出正確。
+2024-11-12 02:35:32,376, __main__ - INFO: 
+2024-11-12 02:35:32,376, __main__ - INFO: --------------------------------------------
+2024-11-12 02:35:32,376, __main__ - INFO: 
+2024-11-12 02:35:56,432, __main__ - INFO: 開始運行 methylseqlogo 腳本
+2024-11-12 02:35:56,433, __main__ - INFO: 繪制 JUN Methyl Kullback-Liebler logo，物種：human，細胞類型：H1-hESC，區域：50
+2024-11-12 02:35:56,761, __main__ - INFO: 序列數量：17
+2024-11-12 02:55:25,427, __main__ - INFO: 甲基化讀取計數完成，用時 19 分鐘
+2024-11-12 02:55:25,495, __main__ - INFO: JUN 結合基序長度為 13 bp
+2024-11-12 02:55:25,495, __main__ - WARNING: 用戶定義的繪圖長度超過基序長度
+2024-11-12 02:55:25,496, __main__ - INFO: 繪制 JUN 結合基序，從位置 1 到 13
+2024-11-12 02:56:34,688, __main__ - INFO: 處理鄰近區域
+2024-11-12 02:56:34,688, __main__ - INFO: 找到現有的鄰近背景概率
+2024-11-12 02:56:38,265, __main__ - INFO: JUN_human_H1-hESC_50_Methyl_Kullback-Liebler_seqlogo.png 已保存至 /home/wayne/MethylSeqLogo_automation/bin/../Output1
+2024-11-12 02:56:38,265, __main__ - INFO: 總耗時：20 分 42 秒
+2024-11-12 02:57:18,148, __main__ - INFO: 所有測試通過，輸出正確。
+2024-11-12 02:57:18,148, __main__ - INFO: 
+2024-11-12 02:57:18,148, __main__ - INFO: --------------------------------------------
+2024-11-12 02:57:18,148, __main__ - INFO: 
+2024-11-12 02:57:43,013, __main__ - INFO: 開始運行 methylseqlogo 腳本
+2024-11-12 02:57:43,013, __main__ - INFO: 繪制 JUN Methyl Kullback-Liebler logo，物種：human，細胞類型：H1-hESC，區域：100
+2024-11-12 02:57:43,306, __main__ - INFO: 序列數量：17
+2024-11-12 03:17:42,898, __main__ - INFO: 甲基化讀取計數完成，用時 19 分鐘
+2024-11-12 03:17:42,924, __main__ - INFO: JUN 結合基序長度為 13 bp
+2024-11-12 03:17:42,924, __main__ - WARNING: 用戶定義的繪圖長度超過基序長度
+2024-11-12 03:17:42,924, __main__ - INFO: 繪制 JUN 結合基序，從位置 1 到 13
+2024-11-12 03:18:50,699, __main__ - INFO: 處理鄰近區域
+2024-11-12 03:18:50,700, __main__ - INFO: 找到現有的鄰近背景概率
+2024-11-12 03:18:54,301, __main__ - INFO: JUN_human_H1-hESC_100_Methyl_Kullback-Liebler_seqlogo.png 已保存至 /home/wayne/MethylSeqLogo_automation/bin/../Output1
+2024-11-12 03:18:54,301, __main__ - INFO: 總耗時：21 分 11 秒
+2024-11-12 03:19:33,277, __main__ - INFO: 所有測試通過，輸出正確。
+2024-11-12 03:19:33,277, __main__ - INFO: 
+2024-11-12 03:19:33,277, __main__ - INFO: --------------------------------------------
+2024-11-12 03:19:33,277, __main__ - INFO: 
+2024-11-12 03:19:57,738, __main__ - INFO: 開始運行 methylseqlogo 腳本
+2024-11-12 03:19:57,738, __main__ - INFO: 繪制 JUN Methyl Kullback-Liebler logo，物種：human，細胞類型：H1-hESC，區域：whole_genome
+2024-11-12 03:19:58,042, __main__ - INFO: 序列數量：17
+2024-11-12 03:39:23,372, __main__ - INFO: 甲基化讀取計數完成，用時 19 分鐘
+2024-11-12 03:39:23,399, __main__ - INFO: JUN 結合基序長度為 13 bp
+2024-11-12 03:39:23,399, __main__ - WARNING: 用戶定義的繪圖長度超過基序長度
+2024-11-12 03:39:23,399, __main__ - INFO: 繪制 JUN 結合基序，從位置 1 到 13
+2024-11-12 03:40:35,351, __main__ - INFO: JUN_human_H1-hESC_whole_genome_Methyl_Kullback-Liebler_seqlogo.png 已保存至 /home/wayne/MethylSeqLogo_automation/bin/../Output1
+2024-11-12 03:40:35,351, __main__ - INFO: 總耗時：20 分 38 秒
+2024-11-12 03:41:15,587, __main__ - INFO: 所有測試通過，輸出正確。
+2024-11-12 03:41:15,587, __main__ - INFO: 
+2024-11-12 03:41:15,587, __main__ - INFO: --------------------------------------------
+2024-11-12 03:41:15,587, __main__ - INFO: 
+2024-11-12 03:41:39,826, __main__ - INFO: 開始運行 methylseqlogo 腳本
+2024-11-12 03:41:39,826, __main__ - INFO: 繪制 JUND Methyl Kullback-Liebler logo，物種：human，細胞類型：H1-hESC，區域：50
+2024-11-12 03:41:40,888, __main__ - INFO: 序列數量：8894
+2024-11-12 04:03:04,722, __main__ - INFO: 甲基化讀取計數完成，用時 21 分鐘
+2024-11-12 04:03:04,745, __main__ - INFO: JUND 結合基序長度為 13 bp
+2024-11-12 04:03:04,745, __main__ - WARNING: 用戶定義的繪圖長度超過基序長度
+2024-11-12 04:03:04,745, __main__ - INFO: 繪制 JUND 結合基序，從位置 1 到 13
+2024-11-12 04:05:13,508, __main__ - INFO: 處理鄰近區域
+2024-11-12 04:05:13,508, __main__ - INFO: 找到現有的鄰近背景概率
+2024-11-12 04:05:17,457, __main__ - INFO: JUND_human_H1-hESC_50_Methyl_Kullback-Liebler_seqlogo.png 已保存至 /home/wayne/MethylSeqLogo_automation/bin/../Output1
+2024-11-12 04:05:17,458, __main__ - INFO: 總耗時：23 分 38 秒
+2024-11-12 04:05:59,087, __main__ - INFO: 所有測試通過，輸出正確。
+2024-11-12 04:05:59,087, __main__ - INFO: 
+2024-11-12 04:05:59,087, __main__ - INFO: --------------------------------------------
+2024-11-12 04:05:59,087, __main__ - INFO: 
+2024-11-12 04:06:23,793, __main__ - INFO: 開始運行 methylseqlogo 腳本
+2024-11-12 04:06:23,793, __main__ - INFO: 繪制 JUND Methyl Kullback-Liebler logo，物種：human，細胞類型：H1-hESC，區域：100
+2024-11-12 04:06:24,837, __main__ - INFO: 序列數量：8894
+2024-11-12 04:28:48,622, __main__ - INFO: 甲基化讀取計數完成，用時 22 分鐘
+2024-11-12 04:28:48,669, __main__ - INFO: JUND 結合基序長度為 13 bp
+2024-11-12 04:28:48,669, __main__ - WARNING: 用戶定義的繪圖長度超過基序長度
+2024-11-12 04:28:48,669, __main__ - INFO: 繪制 JUND 結合基序，從位置 1 到 13
+2024-11-12 04:29:55,937, __main__ - INFO: 處理鄰近區域
+2024-11-12 04:29:55,937, __main__ - INFO: 找到現有的鄰近背景概率
+2024-11-12 04:29:59,833, __main__ - INFO: JUND_human_H1-hESC_100_Methyl_Kullback-Liebler_seqlogo.png 已保存至 /home/wayne/MethylSeqLogo_automation/bin/../Output1
+2024-11-12 04:29:59,833, __main__ - INFO: 總耗時：23 分 36 秒
+2024-11-12 04:30:42,701, __main__ - INFO: 所有測試通過，輸出正確。
+2024-11-12 04:30:42,702, __main__ - INFO: 
+2024-11-12 04:30:42,702, __main__ - INFO: --------------------------------------------
+2024-11-12 04:30:42,702, __main__ - INFO: 
+2024-11-12 04:31:07,491, __main__ - INFO: 開始運行 methylseqlogo 腳本
+2024-11-12 04:31:07,491, __main__ - INFO: 繪制 JUND Methyl Kullback-Liebler logo，物種：human，細胞類型：H1-hESC，區域：whole_genome
+2024-11-12 04:31:08,512, __main__ - INFO: 序列數量：8894
+2024-11-12 04:52:48,404, __main__ - INFO: 甲基化讀取計數完成，用時 21 分鐘
+2024-11-12 04:52:48,424, __main__ - INFO: JUND 結合基序長度為 13 bp
+2024-11-12 04:52:48,424, __main__ - WARNING: 用戶定義的繪圖長度超過基序長度
+2024-11-12 04:52:48,424, __main__ - INFO: 繪制 JUND 結合基序，從位置 1 到 13
+2024-11-12 04:54:00,852, __main__ - INFO: JUND_human_H1-hESC_whole_genome_Methyl_Kullback-Liebler_seqlogo.png 已保存至 /home/wayne/MethylSeqLogo_automation/bin/../Output1
+2024-11-12 04:54:00,853, __main__ - INFO: 總耗時：22 分 53 秒
+2024-11-12 04:54:41,690, __main__ - INFO: 所有測試通過，輸出正確。
+2024-11-12 04:54:41,690, __main__ - INFO: 
+2024-11-12 04:54:41,690, __main__ - INFO: --------------------------------------------
+2024-11-12 04:54:41,690, __main__ - INFO: 
+2024-11-12 04:55:05,895, __main__ - INFO: 開始運行 methylseqlogo 腳本
+2024-11-12 04:55:05,895, __main__ - INFO: 繪制 MAFK Methyl Kullback-Liebler logo，物種：human，細胞類型：H1-hESC，區域：50
+2024-11-12 04:55:06,966, __main__ - INFO: 序列數量：10651
+2024-11-12 05:17:01,225, __main__ - INFO: 甲基化讀取計數完成，用時 21 分鐘
+2024-11-12 05:17:01,236, __main__ - INFO: MAFK 結合基序長度為 15 bp
+2024-11-12 05:17:01,236, __main__ - WARNING: 用戶定義的繪圖長度超過基序長度
+2024-11-12 05:17:01,236, __main__ - INFO: 繪制 MAFK 結合基序，從位置 1 到 15
+2024-11-12 05:18:10,305, __main__ - INFO: 處理鄰近區域
+2024-11-12 05:18:10,305, __main__ - INFO: 找到現有的鄰近背景概率
+2024-11-12 05:18:14,624, __main__ - INFO: MAFK_human_H1-hESC_50_Methyl_Kullback-Liebler_seqlogo.png 已保存至 /home/wayne/MethylSeqLogo_automation/bin/../Output1
+2024-11-12 05:18:14,624, __main__ - INFO: 總耗時：23 分 9 秒
+2024-11-12 05:19:00,112, __main__ - INFO: 所有測試通過，輸出正確。
+2024-11-12 05:19:00,112, __main__ - INFO: 
+2024-11-12 05:19:00,112, __main__ - INFO: --------------------------------------------
+2024-11-12 05:19:00,112, __main__ - INFO: 
+2024-11-12 05:19:24,827, __main__ - INFO: 開始運行 methylseqlogo 腳本
+2024-11-12 05:19:24,827, __main__ - INFO: 繪制 MAFK Methyl Kullback-Liebler logo，物種：human，細胞類型：H1-hESC，區域：100
+2024-11-12 05:19:25,922, __main__ - INFO: 序列數量：10651
+2024-11-12 05:40:57,923, __main__ - INFO: 甲基化讀取計數完成，用時 21 分鐘
+2024-11-12 05:40:57,943, __main__ - INFO: MAFK 結合基序長度為 15 bp
+2024-11-12 05:40:57,943, __main__ - WARNING: 用戶定義的繪圖長度超過基序長度
+2024-11-12 05:40:57,943, __main__ - INFO: 繪制 MAFK 結合基序，從位置 1 到 15
+2024-11-12 05:42:05,856, __main__ - INFO: 處理鄰近區域
+2024-11-12 05:42:05,857, __main__ - INFO: 找到現有的鄰近背景概率
+2024-11-12 05:42:09,921, __main__ - INFO: MAFK_human_H1-hESC_100_Methyl_Kullback-Liebler_seqlogo.png 已保存至 /home/wayne/MethylSeqLogo_automation/bin/../Output1
+2024-11-12 05:42:09,921, __main__ - INFO: 總耗時：22 分 45 秒
+2024-11-12 05:42:56,682, __main__ - INFO: 所有測試通過，輸出正確。
+2024-11-12 05:42:56,682, __main__ - INFO: 
+2024-11-12 05:42:56,682, __main__ - INFO: --------------------------------------------
+2024-11-12 05:42:56,682, __main__ - INFO: 
+2024-11-12 05:43:20,676, __main__ - INFO: 開始運行 methylseqlogo 腳本
+2024-11-12 05:43:20,677, __main__ - INFO: 繪制 MAFK Methyl Kullback-Liebler logo，物種：human，細胞類型：H1-hESC，區域：whole_genome
+2024-11-12 05:43:21,659, __main__ - INFO: 序列數量：10651
+2024-11-12 06:04:49,367, __main__ - INFO: 甲基化讀取計數完成，用時 21 分鐘
+2024-11-12 06:04:49,384, __main__ - INFO: MAFK 結合基序長度為 15 bp
+2024-11-12 06:04:49,384, __main__ - WARNING: 用戶定義的繪圖長度超過基序長度
+2024-11-12 06:04:49,384, __main__ - INFO: 繪制 MAFK 結合基序，從位置 1 到 15
+2024-11-12 06:06:02,655, __main__ - INFO: MAFK_human_H1-hESC_whole_genome_Methyl_Kullback-Liebler_seqlogo.png 已保存至 /home/wayne/MethylSeqLogo_automation/bin/../Output1
+2024-11-12 06:06:02,656, __main__ - INFO: 總耗時：22 分 42 秒
+2024-11-12 06:06:48,229, __main__ - INFO: 所有測試通過，輸出正確。
+2024-11-12 06:06:48,229, __main__ - INFO: 
+2024-11-12 06:06:48,229, __main__ - INFO: --------------------------------------------
+2024-11-12 06:06:48,229, __main__ - INFO: 
+2024-11-12 06:07:11,869, __main__ - INFO: 開始運行 methylseqlogo 腳本
+2024-11-12 06:07:11,870, __main__ - INFO: 繪制 RFX5 Methyl Kullback-Liebler logo，物種：human，細胞類型：H1-hESC，區域：50
+2024-11-12 06:07:12,212, __main__ - INFO: 序列數量：566
+2024-11-12 06:27:52,925, __main__ - INFO: 甲基化讀取計數完成，用時 20 分鐘
+2024-11-12 06:27:52,950, __main__ - INFO: RFX5 結合基序長度為 15 bp
+2024-11-12 06:27:52,950, __main__ - WARNING: 用戶定義的繪圖長度超過基序長度
+2024-11-12 06:27:52,950, __main__ - INFO: 繪制 RFX5 結合基序，從位置 1 到 15
+2024-11-12 06:29:00,655, __main__ - INFO: 處理鄰近區域
+2024-11-12 06:29:00,655, __main__ - INFO: 找到現有的鄰近背景概率
+2024-11-12 06:29:04,486, __main__ - INFO: RFX5_human_H1-hESC_50_Methyl_Kullback-Liebler_seqlogo.png 已保存至 /home/wayne/MethylSeqLogo_automation/bin/../Output1
+2024-11-12 06:29:04,486, __main__ - INFO: 總耗時：21 分 53 秒
+2024-11-12 06:29:53,569, __main__ - INFO: 所有測試通過，輸出正確。
+2024-11-12 06:29:53,569, __main__ - INFO: 
+2024-11-12 06:29:53,569, __main__ - INFO: --------------------------------------------
+2024-11-12 06:29:53,570, __main__ - INFO: 
+2024-11-12 06:30:18,373, __main__ - INFO: 開始運行 methylseqlogo 腳本
+2024-11-12 06:30:18,373, __main__ - INFO: 繪制 RFX5 Methyl Kullback-Liebler logo，物種：human，細胞類型：H1-hESC，區域：100
+2024-11-12 06:30:18,726, __main__ - INFO: 序列數量：566
+2024-11-12 06:50:36,969, __main__ - INFO: 甲基化讀取計數完成，用時 20 分鐘
+2024-11-12 06:50:37,018, __main__ - INFO: RFX5 結合基序長度為 15 bp
+2024-11-12 06:50:37,018, __main__ - WARNING: 用戶定義的繪圖長度超過基序長度
+2024-11-12 06:50:37,018, __main__ - INFO: 繪制 RFX5 結合基序，從位置 1 到 15
+2024-11-12 06:51:45,096, __main__ - INFO: 處理鄰近區域
+2024-11-12 06:51:45,096, __main__ - INFO: 找到現有的鄰近背景概率
+2024-11-12 06:51:48,812, __main__ - INFO: RFX5_human_H1-hESC_100_Methyl_Kullback-Liebler_seqlogo.png 已保存至 /home/wayne/MethylSeqLogo_automation/bin/../Output1
+2024-11-12 06:51:48,812, __main__ - INFO: 總耗時：21 分 30 秒
+2024-11-12 06:52:39,750, __main__ - INFO: 所有測試通過，輸出正確。
+2024-11-12 06:52:39,751, __main__ - INFO: 
+2024-11-12 06:52:39,751, __main__ - INFO: --------------------------------------------
+2024-11-12 06:52:39,751, __main__ - INFO: 
+2024-11-12 06:53:03,855, __main__ - INFO: 開始運行 methylseqlogo 腳本
+2024-11-12 06:53:03,855, __main__ - INFO: 繪制 RFX5 Methyl Kullback-Liebler logo，物種：human，細胞類型：H1-hESC，區域：whole_genome
+2024-11-12 06:53:04,196, __main__ - INFO: 序列數量：566
+2024-11-12 07:13:32,081, __main__ - INFO: 甲基化讀取計數完成，用時 20 分鐘
+2024-11-12 07:13:32,110, __main__ - INFO: RFX5 結合基序長度為 15 bp
+2024-11-12 07:13:32,110, __main__ - WARNING: 用戶定義的繪圖長度超過基序長度
+2024-11-12 07:13:32,110, __main__ - INFO: 繪制 RFX5 結合基序，從位置 1 到 15
+2024-11-12 07:14:44,558, __main__ - INFO: RFX5_human_H1-hESC_whole_genome_Methyl_Kullback-Liebler_seqlogo.png 已保存至 /home/wayne/MethylSeqLogo_automation/bin/../Output1
+2024-11-12 07:14:44,559, __main__ - INFO: 總耗時：21 分 41 秒
+2024-11-12 07:15:35,227, __main__ - INFO: 所有測試通過，輸出正確。
+2024-11-12 07:15:35,227, __main__ - INFO: 
+2024-11-12 07:15:35,227, __main__ - INFO: --------------------------------------------
+2024-11-12 07:15:35,227, __main__ - INFO: 
+2024-11-12 07:15:59,243, __main__ - INFO: 開始運行 methylseqlogo 腳本
+2024-11-12 07:15:59,243, __main__ - INFO: 繪制 SP2 Methyl Kullback-Liebler logo，物種：human，細胞類型：H1-hESC，區域：50
+2024-11-12 07:15:59,662, __main__ - INFO: 序列數量：1018
+2024-11-12 07:36:29,363, __main__ - INFO: 甲基化讀取計數完成，用時 20 分鐘
+2024-11-12 07:36:29,386, __main__ - INFO: SP2 結合基序長度為 15 bp
+2024-11-12 07:36:29,386, __main__ - WARNING: 用戶定義的繪圖長度超過基序長度
+2024-11-12 07:36:29,387, __main__ - INFO: 繪制 SP2 結合基序，從位置 1 到 15
+2024-11-12 07:37:38,648, __main__ - INFO: 處理鄰近區域
+2024-11-12 07:37:38,648, __main__ - INFO: 找到現有的鄰近背景概率
+2024-11-12 07:37:42,421, __main__ - INFO: SP2_human_H1-hESC_50_Methyl_Kullback-Liebler_seqlogo.png 已保存至 /home/wayne/MethylSeqLogo_automation/bin/../Output1
+2024-11-12 07:37:42,422, __main__ - INFO: 總耗時：21 分 43 秒
+2024-11-12 07:38:35,457, __main__ - INFO: 所有測試通過，輸出正確。
+2024-11-12 07:38:35,457, __main__ - INFO: 
+2024-11-12 07:38:35,457, __main__ - INFO: --------------------------------------------
+2024-11-12 07:38:35,457, __main__ - INFO: 
+2024-11-12 07:39:00,157, __main__ - INFO: 開始運行 methylseqlogo 腳本
+2024-11-12 07:39:00,157, __main__ - INFO: 繪制 SP2 Methyl Kullback-Liebler logo，物種：human，細胞類型：H1-hESC，區域：100
+2024-11-12 07:39:00,547, __main__ - INFO: 序列數量：1018
+2024-11-12 07:59:41,549, __main__ - INFO: 甲基化讀取計數完成，用時 20 分鐘
+2024-11-12 07:59:41,607, __main__ - INFO: SP2 結合基序長度為 15 bp
+2024-11-12 07:59:41,608, __main__ - WARNING: 用戶定義的繪圖長度超過基序長度
+2024-11-12 07:59:41,608, __main__ - INFO: 繪制 SP2 結合基序，從位置 1 到 15
+2024-11-12 08:00:54,763, __main__ - INFO: 處理鄰近區域
+2024-11-12 08:00:54,763, __main__ - INFO: 找到現有的鄰近背景概率
+2024-11-12 08:00:58,490, __main__ - INFO: SP2_human_H1-hESC_100_Methyl_Kullback-Liebler_seqlogo.png 已保存至 /home/wayne/MethylSeqLogo_automation/bin/../Output1
+2024-11-12 08:00:58,490, __main__ - INFO: 總耗時：21 分 58 秒
+2024-11-12 08:01:48,038, __main__ - INFO: 所有測試通過，輸出正確。
+2024-11-12 08:01:48,039, __main__ - INFO: 
+2024-11-12 08:01:48,039, __main__ - INFO: --------------------------------------------
+2024-11-12 08:01:48,039, __main__ - INFO: 
+2024-11-12 08:02:12,266, __main__ - INFO: 開始運行 methylseqlogo 腳本
+2024-11-12 08:02:12,266, __main__ - INFO: 繪制 SP2 Methyl Kullback-Liebler logo，物種：human，細胞類型：H1-hESC，區域：whole_genome
+2024-11-12 08:02:12,825, __main__ - INFO: 序列數量：1018
+2024-11-12 08:23:08,149, __main__ - INFO: 甲基化讀取計數完成，用時 20 分鐘
+2024-11-12 08:23:08,175, __main__ - INFO: SP2 結合基序長度為 15 bp
+2024-11-12 08:23:08,175, __main__ - WARNING: 用戶定義的繪圖長度超過基序長度
+2024-11-12 08:23:08,175, __main__ - INFO: 繪制 SP2 結合基序，從位置 1 到 15
+2024-11-12 08:24:22,172, __main__ - INFO: SP2_human_H1-hESC_whole_genome_Methyl_Kullback-Liebler_seqlogo.png 已保存至 /home/wayne/MethylSeqLogo_automation/bin/../Output1
+2024-11-12 08:24:22,173, __main__ - INFO: 總耗時：22 分 10 秒
+2024-11-12 08:25:13,103, __main__ - INFO: 所有測試通過，輸出正確。
+2024-11-12 08:25:13,103, __main__ - INFO: 
+2024-11-12 08:25:13,103, __main__ - INFO: --------------------------------------------
+2024-11-12 08:25:13,103, __main__ - INFO: 
+2024-11-12 08:25:37,484, __main__ - INFO: 開始運行 methylseqlogo 腳本
+2024-11-12 08:25:37,484, __main__ - INFO: 繪制 USF2 Methyl Kullback-Liebler logo，物種：human，細胞類型：H1-hESC，區域：50
+2024-11-12 08:25:38,529, __main__ - INFO: 序列數量：11344
+2024-11-12 08:46:48,635, __main__ - INFO: 甲基化讀取計數完成，用時 21 分鐘
+2024-11-12 08:46:48,646, __main__ - INFO: USF2 結合基序長度為 14 bp
+2024-11-12 08:46:48,646, __main__ - WARNING: 用戶定義的繪圖長度超過基序長度
+2024-11-12 08:46:48,646, __main__ - INFO: 繪制 USF2 結合基序，從位置 1 到 14
+2024-11-12 08:47:57,837, __main__ - INFO: 處理鄰近區域
+2024-11-12 08:47:57,837, __main__ - INFO: 找到現有的鄰近背景概率
+2024-11-12 08:48:02,383, __main__ - INFO: USF2_human_H1-hESC_50_Methyl_Kullback-Liebler_seqlogo.png 已保存至 /home/wayne/MethylSeqLogo_automation/bin/../Output1
+2024-11-12 08:48:02,383, __main__ - INFO: 總耗時：22 分 25 秒
+2024-11-12 08:48:58,495, __main__ - INFO: 所有測試通過，輸出正確。
+2024-11-12 08:48:58,495, __main__ - INFO: 
+2024-11-12 08:48:58,495, __main__ - INFO: --------------------------------------------
+2024-11-12 08:48:58,495, __main__ - INFO: 
+2024-11-12 08:49:22,898, __main__ - INFO: 開始運行 methylseqlogo 腳本
+2024-11-12 08:49:22,898, __main__ - INFO: 繪制 USF2 Methyl Kullback-Liebler logo，物種：human，細胞類型：H1-hESC，區域：100
+2024-11-12 08:49:24,028, __main__ - INFO: 序列數量：11344
+2024-11-12 09:11:11,097, __main__ - INFO: 甲基化讀取計數完成，用時 21 分鐘
+2024-11-12 09:11:11,116, __main__ - INFO: USF2 結合基序長度為 14 bp
+2024-11-12 09:11:11,116, __main__ - WARNING: 用戶定義的繪圖長度超過基序長度
+2024-11-12 09:11:11,116, __main__ - INFO: 繪制 USF2 結合基序，從位置 1 到 14
+2024-11-12 09:12:20,854, __main__ - INFO: 處理鄰近區域
+2024-11-12 09:12:20,854, __main__ - INFO: 找到現有的鄰近背景概率
+2024-11-12 09:12:25,549, __main__ - INFO: USF2_human_H1-hESC_100_Methyl_Kullback-Liebler_seqlogo.png 已保存至 /home/wayne/MethylSeqLogo_automation/bin/../Output1
+2024-11-12 09:12:25,549, __main__ - INFO: 總耗時：23 分 3 秒
+2024-11-12 09:13:25,140, __main__ - INFO: 所有測試通過，輸出正確。
+2024-11-12 09:13:25,140, __main__ - INFO: 
+2024-11-12 09:13:25,140, __main__ - INFO: --------------------------------------------
+2024-11-12 09:13:25,140, __main__ - INFO: 
