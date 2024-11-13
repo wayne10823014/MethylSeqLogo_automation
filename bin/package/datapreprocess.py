@@ -260,11 +260,7 @@ def methylread_counter(TFBSFile, WGBSFile, total):
     ctx_dict = pd.DataFrame(ctx)
     cread_dict = pd.DataFrame(cread)
     tread_dict = pd.DataFrame(tread)
-
-    ctx_dict.to_csv("ctx.csv", sep='\t', index=False)
-    cread_dict.to_csv("cread.csv", sep='\t', index=False)
-    tread_dict.to_csv("tread.csv", sep='\t', index=False)
-    print("ctx_dict saved.")
+    
     return ctx_dict, cread_dict, tread_dict
 
 
