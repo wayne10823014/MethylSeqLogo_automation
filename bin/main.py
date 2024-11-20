@@ -113,10 +113,12 @@ def main():
 
     # 读取或生成甲基化数据
     if os.path.isfile(ctx_file) and os.path.isfile(cread_file) and os.path.isfile(tread_file):
+        print('檔案存在')
         ctxdata = pd.read_csv(ctx_file, sep='\t')
         creaddata = pd.read_csv(cread_file, sep='\t')
         treaddata = pd.read_csv(tread_file, sep='\t')
     else:
+        print('檔案不存在')
         logger.debug("无 ctx, cread, tread 数据，开始计算...")
         ctxdata, creaddata, treaddata = methylread_counter(tfbs_bed, methylbed, total)
 

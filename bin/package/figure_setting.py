@@ -3,6 +3,7 @@ import matplotlib
 matplotlib.use('Agg')  # 不显示图形界面
 import matplotlib.pyplot as plt
 import matplotlib.patheffects as patheffects
+from matplotlib.transforms import Affine2D
 from matplotlib.gridspec import GridSpec
 from matplotlib.font_manager import FontProperties
 import matplotlib.patches as patches
@@ -59,7 +60,7 @@ class Scale(patheffects.RendererBase):
         self._sy = sy
 
     def draw_path(self, renderer, gc, tpath, affine, rgbFace):
-        affine = affine.identity().scale(self._sx, self._sy) + affine
+        affine = Affine2D().scale(self._sx, self._sy) + affine
         renderer.draw_path(gc, tpath, affine, rgbFace)
 
 class SeqLogoPlot:
