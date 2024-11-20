@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patheffects as patheffects
 from matplotlib.gridspec import GridSpec
 from matplotlib.font_manager import FontProperties
+from matplotlib.transforms import Affine2D
 import matplotlib.patches as patches
 from matplotlib import transforms
 import seaborn as sns
@@ -59,7 +60,7 @@ class Scale(patheffects.RendererBase):
         self._sy = sy
 
     def draw_path(self, renderer, gc, tpath, affine, rgbFace):
-        affine = affine.identity().scale(self._sx, self._sy) + affine
+        affine = Affine2D().scale(self._sx, self._sy) + affine
         renderer.draw_path(gc, tpath, affine, rgbFace)
 
 class SeqLogoPlot:

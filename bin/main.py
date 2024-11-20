@@ -7,7 +7,7 @@ import logging
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from Bio import SeqIO
+from Bio.Seq import Seq
 from Bio.SeqUtils.CheckSum import seguid
 
 from package.arg import get_parser
@@ -17,15 +17,17 @@ from package.calculate import *
 from package.figure_setting import *
 
 
-def remove_dup_seqs(records):
-    """从 SeqRecord 迭代器中移除重复的序列。"""
+def remove_dup_seqs(seq_dict):
+    """从序列字典中移除重复的序列。"""
     checksums = set()
-    for record in records:
-        checksum = seguid(record.seq)
+    unique_seq_dict = {}
+    for key, sequence in seq_dict.items():
+        checksum = seguid(Seq(sequence))
         if checksum in checksums:
             continue
         checksums.add(checksum)
-        yield record
+        unique_seq_dict[key] = sequence
+    return unique_seq_dict
 
 
 def main():
@@ -83,18 +85,18 @@ def main():
     tfbs_bed, modify_coordinate_list, modify_coordinate, motif_len = get_tfbs(
         remap_file, jaspar_file, species, spanL, spanR)
 
-    # 获取序列并构建 total
-    total, seq_file = get_seq(species, modify_coordinate_list, modify_coordinate, spanL, spanR, motif_len)
+    # 获取序列并构建 total 和 seq_dict
+    total, seq_dict = get_seq(species, modify_coordinate_list, modify_coordinate, spanL, spanR, motif_len)
 
     # 解析序列
     try:
-        seq_dict = SeqIO.to_dict(SeqIO.parse(seq_file, 'fasta'))
+        # 将序列字典转换为 DataFrame，每个序列作为一行
+        seqdata = pd.DataFrame([list(seq.upper()) for seq in seq_dict.values()])
     except Exception as e:
         logger.warning("解析序列时出错：%s。正在移除重复序列。", e)
-        seq_records = remove_dup_seqs(SeqIO.parse(seq_file, 'fasta'))
-        seq_dict = SeqIO.to_dict(seq_records)
+        seq_dict = remove_dup_seqs(seq_dict)
+        seqdata = pd.DataFrame([list(seq.upper()) for seq in seq_dict.values()])
 
-    seqdata = pd.DataFrame.from_dict(seq_dict, orient='index').reset_index(drop=True)
     logger.info("序列数量：%d", len(seqdata))
 
     start = time.time()
@@ -112,19 +114,24 @@ def main():
     logger.debug("上下文文件路径：%s", ctx_file)
 
     # 读取或生成甲基化数据
-    if os.path.isfile(ctx_file) and os.path.isfile(cread_file) and os.path.isfile(tread_file):
-        ctxdata = pd.read_csv(ctx_file, sep='\t')
-        creaddata = pd.read_csv(cread_file, sep='\t')
-        treaddata = pd.read_csv(tread_file, sep='\t')
-    else:
-        logger.debug("无 ctx, cread, tread 数据，开始计算...")
-        ctxdata, creaddata, treaddata = methylread_counter(tfbs_bed, methylbed, total)
+    # if os.path.isfile(ctx_file) and os.path.isfile(cread_file) and os.path.isfile(tread_file):
+    #     ctxdata = pd.read_csv(ctx_file, sep='\t')
+    #     creaddata = pd.read_csv(cread_file, sep='\t')
+    #     treaddata = pd.read_csv(tread_file, sep='\t')
+    # else:
+    logger.debug("无 ctx, cread, tread 数据，开始计算...")
+    ctxdata, creaddata, treaddata = methylread_counter(tfbs_bed, methylbed, total)
+
+        # 将数据保存为 CSV 文件
+    ctxdata.to_csv(ctx_file, sep='\t', index=False)
+    creaddata.to_csv(cread_file, sep='\t', index=False)
+    treaddata.to_csv(tread_file, sep='\t', index=False)
 
     end = time.time()
     logger.info("甲基化读取计数完成，用时 %d 分钟", (end - start) // 60)
 
     # 计算基序长度
-    motif_len_seqdata = len(seqdata.columns) - (spanL + spanR)
+    motif_len_seqdata = seqdata.shape[1] - (spanL + spanR)
     logger.info("%s 结合基序长度为 %d bp", TF, motif_len_seqdata)
 
     # 确定绘图长度
@@ -145,11 +152,6 @@ def main():
     ctxdata = ctxdata.iloc[:, beginningoftfbs - 1:endpos]
     creaddata = creaddata.iloc[:, beginningoftfbs - 1:endpos]
     treaddata = treaddata.iloc[:, beginningoftfbs - 1:endpos]
-
-    # 将数据保存为 CSV 文件
-    ctxdata.to_csv(ctx_file, sep='\t', index=False)
-    creaddata.to_csv(cread_file, sep='\t', index=False)
-    treaddata.to_csv(tread_file, sep='\t', index=False)
 
     pseudocount = 1.0  # 设置伪计数（用于计算模块）
 
