@@ -178,72 +178,105 @@ def get_seq(species, seq_list, tfbs_modify_coordinate, span1, span2, motif_len):
                             temp[base - span1] = 'Z'
     return total, tfbss_fa.seqfn
 
-
 def methylread_counter(TFBSFile, WGBSFile, total):
-    """
-    计算每个 TFBS 的甲基化信息。
-
-    参数：
-    - TFBSFile (BedTool): TFBS 文件。
-    - WGBSFile (list): WGBS 文件列表。
-    - total (defaultdict): 存储序列信息的字典。
-
-    返回：
-    - ctx_dict (DataFrame): 上下文信息。
-    - cread_dict (DataFrame): 甲基化的读计数。
-    - tread_dict (DataFrame): 未甲基化的读计数。
-    """
+    import subprocess
+    import tempfile
+    import shutil
     print('\nStarting methylread_counter...')
     count = 1
     TFBSs = TFBSFile
     WGBSFile = [filepath for sublist in WGBSFile for filepath in sublist]
 
+    # 使用您指定的临时目录（如果需要）
+    temp_dir = '/home/wayne/tmp'  # 请确保该目录存在且有足够的空间
+    os.makedirs(temp_dir, exist_ok=True)
+
+    # 设置 pybedtools 的临时目录
+    pybedtools.helpers.set_tempdir(temp_dir)
+
+    # 使用已排序的 TFBS 文件
+    if isinstance(TFBSs, pybedtools.BedTool):
+        TFBSs_fn = TFBSs.fn
+    else:
+        TFBSs_fn = os.path.join(temp_dir, "tfbs_temp.bed")
+        TFBSs.saveas(TFBSs_fn)
+
+    # 如果 TFBSs_fn 不是已排序的文件路径，则直接使用
+    sorted_TFBSs_fn = TFBSs_fn  # 假设已排序
+
     for file in WGBSFile:
-        WGBS = pybedtools.BedTool(file)
-        start = time.time()
-        Methylation_of_TFBSs = WGBS.intersect(TFBSs, wa=True, wb=True)
-        end = time.time()
-        print(f'Intersection finished, cost {(end - start) / 60:.2f} min')
-        start = time.time()
-        with open(Methylation_of_TFBSs.fn) as f:
-            readMethylofTFBSsFile = f.readlines()
-        print(f'File {count} processing finished...')
+        WGBS_fn = file
 
-        for line in readMethylofTFBSsFile:
-            fields = line.strip().split()
-            tfbsstartpos = fields[12]
-            tfbsendpos = fields[13]
-            chr = fields[0]
-            base_MethylationInfo_pos = fields[1]
-            capped_read = int(fields[9])
-            methyl_read = capped_read * int(fields[10]) // 100
-            strand = fields[-1]
+        # 直接使用已排序的 WGBS 文件
+        sorted_WGBS_fn = WGBS_fn  # 假设已排序
 
-            key = f'>{chr}:{tfbsstartpos}-{tfbsendpos}{strand}'
-            if key not in total:
-                continue  # 如果键不在 total 中，跳过
+        # 使用 BEDOPS 的 bedmap 进行映射
+        bedmap_cmd = f"bedmap --echo --echo-map {sorted_TFBSs_fn} {sorted_WGBS_fn}"
 
-            if strand == '+':
-                # tread
-                temp = total[key][1]
-                idx = int(base_MethylationInfo_pos) - int(tfbsstartpos)
-                temp[idx] += capped_read - methyl_read
-                # cread
-                temp1 = total[key][2]
-                temp1[idx] += methyl_read
-            else:
-                try:
-                    temp = total[key][1]
-                    idx = int(tfbsstartpos) - int(base_MethylationInfo_pos) - 1
-                    temp[idx] += capped_read - methyl_read
-                    # cread
-                    temp1 = total[key][2]
-                    temp1[idx] += methyl_read
-                except IndexError:
-                    print("IndexError occurred.")
-                    pass
-        end = time.time()
+        # 运行 bedmap 并将输出写入临时文件
+        with tempfile.NamedTemporaryFile(dir=temp_dir, mode='w+', delete=False) as temp_output:
+            temp_output_fn = temp_output.name
+            subprocess.run(bedmap_cmd, shell=True, stdout=temp_output, check=True)
+
+        # 按行处理 bedmap 输出文件
+        with open(temp_output_fn, 'r') as f:
+            for line in f:
+                parts = line.strip().split('|')
+                if len(parts) < 2 or not parts[1]:
+                    continue  # 没有重叠的 WGBS 条目
+
+                # TFBS 字段
+                tfbs_fields = parts[0].split('\t')
+                if len(tfbs_fields) < 3:
+                    continue  # 跳过格式不正确的行
+                tfbs_chrom = tfbs_fields[0]
+                tfbs_start = tfbs_fields[1]
+                tfbs_end = tfbs_fields[2]
+                tfbs_strand = tfbs_fields[5] if len(tfbs_fields) > 5 else '+'
+
+                key = f'>{tfbs_chrom}:{tfbs_start}-{tfbs_end}{tfbs_strand}'
+
+                if key not in total:
+                    continue  # 跳过不在 total 中的键
+
+                # 映射的 WGBS 条目
+                wgbs_entries = parts[1].split(';')
+                for wgbs_entry in wgbs_entries:
+                    wgbs_fields = wgbs_entry.strip().split('\t')
+                    if len(wgbs_fields) < 11:
+                        continue  # 跳过字段不足的行
+
+                    base_MethylationInfo_pos = wgbs_fields[1]
+                    try:
+                        capped_read = int(wgbs_fields[9])
+                        methyl_read = capped_read * int(wgbs_fields[10]) // 100
+                    except ValueError:
+                        continue  # 跳过无法转换为整数的行
+
+                    if tfbs_strand == '+':
+                        # tread
+                        temp = total[key][1]
+                        idx = int(base_MethylationInfo_pos) - int(tfbs_start)
+                        if 0 <= idx < len(temp):
+                            temp[idx] += capped_read - methyl_read
+                            # cread
+                            temp1 = total[key][2]
+                            temp1[idx] += methyl_read
+                    else:
+                        temp = total[key][1]
+                        idx = int(tfbs_end) - int(base_MethylationInfo_pos) - 1
+                        if 0 <= idx < len(temp):
+                            temp[idx] += capped_read - methyl_read
+                            # cread
+                            temp1 = total[key][2]
+                            temp1[idx] += methyl_read
+
+        # 删除临时输出文件
+        os.remove(temp_output_fn)
         count += 1
+
+    # 清理 pybedtools 临时文件
+    pybedtools.cleanup()
 
     ctx = []
     tread = []
@@ -260,7 +293,7 @@ def methylread_counter(TFBSFile, WGBSFile, total):
     ctx_dict = pd.DataFrame(ctx)
     cread_dict = pd.DataFrame(cread)
     tread_dict = pd.DataFrame(tread)
-    
+
     return ctx_dict, cread_dict, tread_dict
 
 
