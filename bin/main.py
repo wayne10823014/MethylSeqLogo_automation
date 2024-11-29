@@ -187,7 +187,7 @@ def main():
         else:
             logger.info('生成启动子背景概率')
             start_time = time.time()
-            bgpps, bg_mCG, bg_mCHG, bg_mCHH = promoter(tfbs_bed, species, methylbed, celltype, region, TF)
+            bgpps, bg_mCG, bg_mCHG, bg_mCHH = promoter( species, methylbed, celltype, TF)
             end_time = time.time()
             logger.info('启动子背景计算完成，用时 %d 分钟', (end_time - start_time) // 60)
 

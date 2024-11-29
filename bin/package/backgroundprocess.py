@@ -62,10 +62,15 @@ def read_bgprob_table(species, celltype, region, TF=None):
                                     f"{species}_{region}_probability.txt")
         celltype_file = os.path.join(dir_path, "../../Background_probability", region,
                                      f"{species}_{celltype}_{region}_methyl_probability.txt")
-    else:
+    elif region == 'neighbor':
         species_file = os.path.join(dir_path, "../../Background_probability", "neighbor",
                                     f"{species}_{TF}_{celltype}_{region}_probability.txt")
         celltype_file = os.path.join(dir_path, "../../Background_probability", "neighbor",
+                                     f"{species}_{TF}_{celltype}_{region}_methyl_probability.txt")
+    else : 
+        species_file = os.path.join(dir_path, "../../Background_probability", "promoter",
+                                    f"{species}_{TF}_{celltype}_{region}_probability.txt")
+        celltype_file = os.path.join(dir_path, "../../Background_probability", "promoter",
                                      f"{species}_{TF}_{celltype}_{region}_methyl_probability.txt")
 
     species_data = isfile(species_file)
@@ -299,51 +304,31 @@ def calc_mlevel(fileA, fileB):
 
 
 def calculate_methylation_level(tfbs_bed, wgbs_files, species_name, celltype, region, directory, TF):
-    """
-    計算鄰近區域的甲基化水平。
-
-    參數:
-    - tfbs_bed (BedTool): TFBS的BedTool對象。
-    - wgbs_files (list): WGBS文件列表，每個元素是一個包含兩個文件路徑的元組。
-    - species_name (str): 物種名稱。
-    - celltype (str): 細胞類型。
-    - region (str): 區域。
-    - directory (str): 目錄名稱。
-    - TF (str): 轉錄因子名稱。
-    """
     print('~~ Calculating methylation level for neighbor ~~')
     TFBSs = tfbs_bed
     names = ['CG', 'CHG', 'CHH']
     total = []
     count = 0
     for files in wgbs_files:
-        start = time.time()
-        wgbs = pybedtools.BedTool(files[0])
-        wgbs_tfbs_A = wgbs.intersect(TFBSs, wa=True)
-        wgbs_tfbs_A = wgbs_tfbs_A.sort()
-        wgbs_tfbs_A_df = pd.DataFrame(wgbs_tfbs_A)
-        path_name_A = os.path.join(dir_path, "../temp",
-                                   f"{celltype}_WGBS_{names[count]}_{directory}_region_1.bed")
-        wgbs_tfbs_A_df.to_csv(path_name_A, sep='\t', index=False, header=False)
-        end = time.time()
         print(names[count])
-        print('wgbs_tfbs_A intersect finished, cost', (end - start) // 60, 'min')
-
         start = time.time()
-        wgbs = pybedtools.BedTool(files[1])
-        wgbs_tfbs_B = wgbs.intersect(TFBSs, wa=True)
-        wgbs_tfbs_B = wgbs_tfbs_B.sort()
-        wgbs_tfbs_B_df = pd.DataFrame(wgbs_tfbs_B)
-        path_name_B = os.path.join(dir_path, "../temp",
-                                   f"{celltype}_WGBS_{names[count]}_{directory}_region_2.bed")
-        wgbs_tfbs_B_df.to_csv(path_name_B, sep='\t', index=False, header=False)
-        end = time.time()
-        print('wgbs_tfbs_B intersect finished, cost', (end - start) // 60, 'min')
-
-        result = calc_mlevel(path_name_A, path_name_B)
+        
+        # 使用 intersect 流式处理
+        wgbs_A = pybedtools.BedTool(files[0])
+        wgbs_B = pybedtools.BedTool(files[1])
+        
+        # 交集操作，结果作为生成器返回
+        wgbs_tfbs_A = wgbs_A.intersect(TFBSs, wa=True, stream=True)
+        wgbs_tfbs_B = wgbs_B.intersect(TFBSs, wa=True, stream=True)
+        
+        # 计算甲基化水平
+        result = calc_mlevel_stream(wgbs_tfbs_A, wgbs_tfbs_B)
         total.append(result)
         count += 1
-
+        
+        end = time.time()
+        print(f"Processing {names[count-1]} finished, cost {(end - start) / 60:.2f} min\n")
+    
     df = pd.DataFrame(total, columns=[directory], index=['mCG', 'mCHG', 'mCHH'])
     print('~~ Saving results ~~')
     output_path = os.path.join(dir_path, '../../Background_probability', directory,
@@ -351,31 +336,97 @@ def calculate_methylation_level(tfbs_bed, wgbs_files, species_name, celltype, re
     df.to_csv(output_path, sep='\t', float_format='%.4f')
     print('~~ Results saved ~~')
 
+def calc_mlevel_stream(wgbs_tfbs_A, wgbs_tfbs_B):
+    print('~~ Calculating methylation level ~~')
+    total, count = 0, 0
+    s_time = time.time()
+    
+    # 使用 zip 迭代两个生成器
+    for line_A, line_B in zip(wgbs_tfbs_A, wgbs_tfbs_B):
+        wgbs_from_fileA = str(line_A).strip().split('\t')
+        wgbs_from_fileB = str(line_B).strip().split('\t')
+        try:
+            reads_A = int(wgbs_from_fileA[-2])
+            reads_B = int(wgbs_from_fileB[-2])
+            meth_A = float(wgbs_from_fileA[-1]) / 100
+            meth_B = float(wgbs_from_fileB[-1]) / 100
 
-def promoter(tfbs_bed, species, wgbs_files, celltype, region, TF=None):
-    """
-    處理啟動子區域的背景概率和甲基化水平。
+            if reads_A < 4 and reads_B < 4:
+                continue
+            elif reads_A == 0:
+                total += meth_B
+                count += 1
+            elif reads_B == 0:
+                total += meth_A
+                count += 1
+            else:
+                read_A = min(reads_A, 4)
+                read_B = min(reads_B, 4)
+                weighted_meth = (meth_A * read_A + meth_B * read_B) / (read_A + read_B)
+                total += weighted_meth
+                count += 1
+        except:
+            pass
 
-    參數:
-    - tfbs_bed (tuple): TFBS的BedTool對象和其他信息。
-    - species (str): 物種名稱。
-    - wgbs_files (list): WGBS文件列表。
-    - celltype (str): 細胞類型。
-    - region (str): 區域。
-    - TF (str): 轉錄因子名稱。
+    end = time.time()
+    print('耗费时间：', (end - s_time) / 60, 'min')
+    if count == 0:
+        print('没有有效的数据点。')
+        return 0.0
+    print('甲基化概率：', total / count, '\n')
+    return f'{total / count:.4f}'
 
-    返回:
-    - 調用read_bgprob_table的結果。
-    """
-    tfbs_bed = modify_bed(tfbs_bed, 50)
-    fasta = pybedtools.BedTool(os.path.join(dir_path, '../genome', f'{species}.fa'))
-    tfbss_fa = tfbs_bed[1].sequence(fi=fasta, s=True)
+
+import os
+import pybedtools
+
+def create_genome_file(fasta_path, genome_file_path):
+    fai_path = fasta_path + '.fai'
+    if not os.path.exists(fai_path):
+        raise FileNotFoundError(f"FASTA 索引文件 {fai_path} 不存在。请先使用 'samtools faidx' 创建索引文件。")
+    with open(fai_path, 'r') as fai_file, open(genome_file_path, 'w') as genome_file:
+        for line in fai_file:
+            fields = line.strip().split('\t')
+            chrom = fields[0]
+            size = fields[1]
+            genome_file.write(f"{chrom}\t{size}\n")
+
+def define_promoter_regions(tss_bed, upstream=1000, downstream=200, genome_file_path=None):
+    if genome_file_path is None:
+        raise ValueError("必须提供 genome_file_path 参数，以避免区域超出染色体边界。")
+    # 使用 'g' 参数指定基因组文件路径
+    promoter_bed = tss_bed.slop(
+        l=upstream,
+        r=downstream,
+        s=True,
+        g=genome_file_path
+    )
+    return promoter_bed
+
+def promoter(species, wgbs_files, celltype, TF=None):
+    tss_bed_path = "/home/wayne/MethylSeqLogo_automation/bin/TSS/TSS.bed"
+    tss_bed = pybedtools.BedTool(tss_bed_path)
+    # 基因组文件路径
+    genome_file_path = os.path.join(dir_path, '../genome', f'{species}.genome')
+    # 创建基因组文件（如果尚未创建）
+    fasta_path = os.path.join(dir_path, '../genome', f'{species}.fa')
+    if not os.path.exists(genome_file_path):
+        create_genome_file(fasta_path, genome_file_path)
+    # 定义启动子区域
+    promoter_bed = define_promoter_regions(tss_bed, upstream=1000, downstream=200, genome_file_path=genome_file_path)
+    # 后续代码
+    # 读取基因组序列
+    fasta = pybedtools.BedTool(fasta_path)
+    # 提取启动子序列
+    tfbss_fa = promoter_bed.sequence(fi=fasta, s=True)
     with open(tfbss_fa.seqfn, 'r') as f:
         tfbss_fasta = f.readlines()
-    process_sequences(tfbss_fasta, species, celltype, region, 'promoter', TF)
-    calculate_methylation_level(tfbs_bed[1], wgbs_files, species, celltype, 'promoter', 'promoter', TF)
-
-    return read_bgprob_table(species, celltype, 'promoter')
+    # 处理序列以计算核苷酸和基序计数
+    process_sequences(tfbss_fasta, species, celltype, 'promoter', 'promoter', TF)
+    # 计算甲基化水平
+    calculate_methylation_level(promoter_bed, wgbs_files, species, celltype, 'promoter', 'promoter', TF)
+    # 读取背景概率表
+    return read_bgprob_table(species, celltype, 'promoter', TF)
 
 
 def neighbor(tfbs_bed, species, wgbs_files, celltype, region, TF):
