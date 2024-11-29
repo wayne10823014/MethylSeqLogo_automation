@@ -178,16 +178,16 @@ def main():
     else:
         logger.info('处理启动子区域')
         bg_prob_file = os.path.join(dir_path, '..', 'Background_probability', 'promoter',
-                                    f"{species}_{celltype}_{region}_probability.txt")
+                                    f"{species}_{TF}_{celltype}_{region}_probability.txt")
         bg_methyl_prob_file = os.path.join(dir_path, '..', 'Background_probability', 'promoter',
-                                           f"{species}_{celltype}_{region}_methyl_probability.txt")
+                                           f"{species}_{TF}_{celltype}_{region}_methyl_probability.txt")
         if os.path.isfile(bg_prob_file) and os.path.isfile(bg_methyl_prob_file):
             logger.info('找到现有的启动子背景概率')
-            bgpps, bg_mCG, bg_mCHG, bg_mCHH = read_bgprob_table(species, celltype, region)
+            bgpps, bg_mCG, bg_mCHG, bg_mCHH = read_bgprob_table(species, celltype, region, TF)
         else:
             logger.info('生成启动子背景概率')
             start_time = time.time()
-            bgpps, bg_mCG, bg_mCHG, bg_mCHH = promoter(tfbs_bed, species, methylbed, celltype, region)
+            bgpps, bg_mCG, bg_mCHG, bg_mCHH = promoter(tfbs_bed, species, methylbed, celltype, region, TF)
             end_time = time.time()
             logger.info('启动子背景计算完成，用时 %d 分钟', (end_time - start_time) // 60)
 
