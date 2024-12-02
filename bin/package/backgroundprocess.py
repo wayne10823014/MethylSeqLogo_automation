@@ -69,9 +69,9 @@ def read_bgprob_table(species, celltype, region, TF=None):
                                      f"{species}_{TF}_{celltype}_{region}_methyl_probability.txt")
     else : 
         species_file = os.path.join(dir_path, "../../Background_probability", "promoter",
-                                    f"{species}_{TF}_{celltype}_{region}_probability.txt")
+                                    f"{species}_{celltype}_{region}_probability.txt")
         celltype_file = os.path.join(dir_path, "../../Background_probability", "promoter",
-                                     f"{species}_{TF}_{celltype}_{region}_methyl_probability.txt")
+                                     f"{species}_{celltype}_{region}_methyl_probability.txt")
 
     species_data = isfile(species_file)
     celltype_data = isfile(celltype_file)
@@ -302,39 +302,33 @@ def calc_mlevel(fileA, fileB):
     print('甲基化概率：', total / count, '\n')
     return f'{total / count:.4f}'
 
-
-def calculate_methylation_level(tfbs_bed, wgbs_files, species_name, celltype, region, directory, TF):
-    print('~~ Calculating methylation level for neighbor ~~')
-    TFBSs = tfbs_bed
+def calculate_methylation_level_whole_genome(wgbs_files, species_name, celltype, region, directory, TF):
+    print('~~ Calculating methylation level for whole genome ~~')
     names = ['CG', 'CHG', 'CHH']
     total = []
     count = 0
     for files in wgbs_files:
         print(names[count])
         start = time.time()
-        
-        # 使用 intersect 流式处理
-        wgbs_A = pybedtools.BedTool(files[0])
-        wgbs_B = pybedtools.BedTool(files[1])
-        
-        # 交集操作，结果作为生成器返回
-        wgbs_tfbs_A = wgbs_A.intersect(TFBSs, wa=True, stream=True)
-        wgbs_tfbs_B = wgbs_B.intersect(TFBSs, wa=True, stream=True)
-        
+
+        wgbs_file_A = files[0]
+        wgbs_file_B = files[1]
+
         # 计算甲基化水平
-        result = calc_mlevel_stream(wgbs_tfbs_A, wgbs_tfbs_B)
+        result = calc_mlevel_whole_genome(wgbs_file_A, wgbs_file_B)
         total.append(result)
         count += 1
-        
+
         end = time.time()
         print(f"Processing {names[count-1]} finished, cost {(end - start) / 60:.2f} min\n")
-    
+
     df = pd.DataFrame(total, columns=[directory], index=['mCG', 'mCHG', 'mCHH'])
     print('~~ Saving results ~~')
     output_path = os.path.join(dir_path, '../../Background_probability', directory,
-                               f'{species_name}_{TF}_{celltype}_{region}_methyl_probability.txt')
+                               f'{species_name}_{celltype}_{region}_methyl_probability.txt')
     df.to_csv(output_path, sep='\t', float_format='%.4f')
     print('~~ Results saved ~~')
+
 
 def calc_mlevel_stream(wgbs_tfbs_A, wgbs_tfbs_B):
     print('~~ Calculating methylation level ~~')
@@ -452,3 +446,223 @@ def neighbor(tfbs_bed, species, wgbs_files, celltype, region, TF):
     calculate_methylation_level(tfbs_bed, wgbs_files, species, celltype, region, 'neighbor', TF)
 
     return read_bgprob_table(species, celltype, region, TF)
+
+def whole(species, wgbs_files, celltype, TF=None):
+    """
+    处理全基因组，计算核苷酸背景概率和甲基化水平。
+
+    参数:
+    - species (str): 物种名称。
+    - wgbs_files (list): WGBS文件列表。
+    - celltype (str): 细胞类型。
+    - TF (str): 转录因子名称（可选）。
+
+    返回:
+    - 调用 read_bgprob_table 的结果。
+    """
+    # 读取基因组序列
+    fasta_path = os.path.join(dir_path, '../genome', f'{species}.fa')
+    fasta = pybedtools.BedTool(fasta_path)
+    
+    # 处理全基因组序列
+    process_sequences_large(fasta_path, species, celltype, 'whole_genome', 'whole_genome', TF)
+    
+    # 计算全基因组甲基化水平
+    calculate_methylation_level_whole_genome(wgbs_files, species, celltype, 'whole_genome', 'whole_genome', TF)
+    
+    # 返回背景概率表和甲基化水平
+    return read_bgprob_table(species, celltype, 'whole_genome', TF)
+
+
+def calc_mlevel_whole_genome(wgbs_file_A, wgbs_file_B):
+    print('~~ Calculating methylation level ~~')
+    total, count = 0, 0
+    s_time = time.time()
+
+    # 使用生成器逐行读取文件，避免将整个文件加载到内存中
+    def read_wgbs_file(file_path):
+        with open(file_path, 'r') as f:
+            for line in f:
+                parts = line.strip().split('\t')
+                chrom, pos = parts[0], int(parts[1])
+                reads = int(parts[-2])
+                meth = float(parts[-1]) / 100
+                yield (chrom, pos, reads, meth)
+
+    # 创建迭代器
+    iter_A = read_wgbs_file(wgbs_file_A)
+    iter_B = read_wgbs_file(wgbs_file_B)
+
+    # 使用合并排序的方式同时遍历两个文件
+    try:
+        item_A = next(iter_A)
+        item_B = next(iter_B)
+        while True:
+            if item_A[:2] == item_B[:2]:
+                # 位点匹配，进行计算
+                reads_A, meth_A = item_A[2], item_A[3]
+                reads_B, meth_B = item_B[2], item_B[3]
+                if reads_A < 4 and reads_B < 4:
+                    pass  # 跳过
+                elif reads_A == 0:
+                    total += meth_B
+                    count += 1
+                elif reads_B == 0:
+                    total += meth_A
+                    count += 1
+                else:
+                    read_A = min(reads_A, 4)
+                    read_B = min(reads_B, 4)
+                    weighted_meth = (meth_A * read_A + meth_B * read_B) / (read_A + read_B)
+                    total += weighted_meth
+                    count += 1
+                item_A = next(iter_A)
+                item_B = next(iter_B)
+            elif item_A[:2] < item_B[:2]:
+                item_A = next(iter_A)
+            else:
+                item_B = next(iter_B)
+    except StopIteration:
+        pass  # 遍历完所有数据
+
+    end = time.time()
+    print('耗费时间：', (end - s_time) / 60, 'min')
+    if count == 0:
+        print('没有有效的数据点。')
+        return '0.0000'
+    print('甲基化概率：', total / count, '\n')
+    return f'{total / count:.4f}'
+
+def calculate_methylation_level_whole_genome(wgbs_files, species_name, celltype, region, directory, TF):
+    print('~~ Calculating methylation level for whole genome ~~')
+    names = ['CG', 'CHG', 'CHH']
+    total = []
+    count = 0
+    for files in wgbs_files:
+        print(names[count])
+        start = time.time()
+
+        wgbs_file_A = files[0]
+        wgbs_file_B = files[1]
+
+        # 计算甲基化水平
+        result = calc_mlevel_whole_genome(wgbs_file_A, wgbs_file_B)
+        total.append(result)
+        count += 1
+
+        end = time.time()
+        print(f"Processing {names[count-1]} finished, cost {(end - start) / 60:.2f} min\n")
+
+    df = pd.DataFrame(total, columns=[directory], index=['mCG', 'mCHG', 'mCHH'])
+    print('~~ Saving results ~~')
+    output_path = os.path.join(dir_path, '../../Background_probability', directory,
+                               f'{species_name}_{celltype}_{region}_methyl_probability.txt')
+    df.to_csv(output_path, sep='\t', float_format='%.4f')
+    print('~~ Results saved ~~')
+
+def process_sequences_large(file_path, species, celltype, region, directory, TF):
+    """
+    处理大型基因组序列文件，计算核苷酸和基序计数。
+
+    参数:
+    - file_path (str): 基因组 FASTA 文件的路径。
+    - species (str): 物种名称。
+    - celltype (str): 细胞类型。
+    - region (str): 区域。
+    - directory (str): 保存输出文件的目录。
+    - TF (str): 转录因子名称。
+    """
+    print('~~ Processing sequences ~~')
+    start_time = time.time()
+    total_cpg, total_chg, total_chh = 0, 0, 0
+
+    mononucleotide_totals = np.zeros(4)  # A, C, G, T
+    dinucleotide_totals = np.zeros(16)  # AA, AC, ..., TT
+
+    # 打开基因组 FASTA 文件，逐步读取序列
+    with open(file_path, 'r') as f:
+        seq = ''
+        for line in f:
+            if line.startswith('>'):
+                # 处理前一个序列
+                if seq:
+                    result = count_nucleotides_and_motifs(seq)
+                    if isinstance(result, int):
+                        continue  # 跳过无效结果
+
+                    cpg, chg, chh, mononucleotide_counts, dinucleotide_counts = result
+
+                    total_cpg += cpg
+                    total_chg += chg
+                    total_chh += chh
+
+                    mononucleotide_totals += np.array([
+                        mononucleotide_counts['A'],
+                        mononucleotide_counts['C'],
+                        mononucleotide_counts['G'],
+                        mononucleotide_counts['T']
+                    ])
+                    dinucleotide_totals += np.array([
+                        dinucleotide_counts[dinuc] for dinuc in sorted(dinucleotide_counts.keys())
+                    ])
+
+                seq = ''  # 重置序列
+            else:
+                seq += line.strip().upper()
+        # 处理最后一个序列
+        if seq:
+            result = count_nucleotides_and_motifs(seq)
+            if not isinstance(result, int):
+                cpg, chg, chh, mononucleotide_counts, dinucleotide_counts = result
+
+                total_cpg += cpg
+                total_chg += chg
+                total_chh += chh
+
+                mononucleotide_totals += np.array([
+                    mononucleotide_counts['A'],
+                    mononucleotide_counts['C'],
+                    mononucleotide_counts['G'],
+                    mononucleotide_counts['T']
+                ])
+                dinucleotide_totals += np.array([
+                    dinucleotide_counts[dinuc] for dinuc in sorted(dinucleotide_counts.keys())
+                ])
+
+    total_motifs = total_cpg + total_chg + total_chh
+    cpg_chg_chh_probs = [
+        f'{total_cpg / total_motifs:.4f}',
+        f'{total_chg / total_motifs:.4f}',
+        f'{total_chh / total_motifs:.4f}'
+    ]
+
+    total_mono = mononucleotide_totals.sum()
+    mononucleotide_probs = (mononucleotide_totals / total_mono).round(4)
+    cpg_chg_chh_probs.extend([f'{prob:.4f}' for prob in mononucleotide_probs])
+
+    dinucleotide_list = dinucleotide_totals.tolist()
+    m_factors = []
+    index = 0
+    for i in range(0, len(dinucleotide_list), 4):
+        dinuc_group = dinucleotide_list[i:i + 4]
+        group_sum = sum(dinuc_group)
+        if group_sum == 0:
+            m_factor = 0
+        else:
+            m_factor = mononucleotide_probs[index] / group_sum
+        m_factors.extend([m_factor] * 4)
+        index += 1
+
+    m_factors = np.array(m_factors)
+    dinucleotide_probs = (dinucleotide_totals * m_factors).round(4)
+    cpg_chg_chh_probs.extend([f'{prob:.4f}' for prob in dinucleotide_probs])
+
+    elapsed_time = time.time() - start_time
+    print(f'Calculation finished in {elapsed_time / 60:.2f} minutes.')
+
+    index_labels = ['CpG', 'CHG', 'CHH', 'A', 'C', 'G', 'T'] + sorted(dinucleotide_counts.keys())
+    df = pd.DataFrame(cpg_chg_chh_probs, columns=[directory], index=index_labels)
+
+    output_path = os.path.join(dir_path, '../../Background_probability', directory,
+                               f'{species}_{region}_probability.txt')
+    df.to_csv(output_path, sep='\t')

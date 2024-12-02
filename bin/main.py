@@ -12,7 +12,7 @@ from Bio.SeqUtils.CheckSum import seguid
 
 from package.arg import get_parser
 from package.datapreprocess import get_tfbs, get_seq, methylread_counter, flanking_bed
-from package.backgroundprocess import read_bgprob_table, promoter, isfile, neighbor
+from package.backgroundprocess import read_bgprob_table, promoter, isfile, neighbor, whole
 from package.calculate import *
 from package.figure_setting import *
 
@@ -113,12 +113,13 @@ def main():
 
     # 读取或生成甲基化数据
     if os.path.isfile(ctx_file) and os.path.isfile(cread_file) and os.path.isfile(tread_file):
-        print('檔案存在')
+        print('甲基化数据存在')
+        logger.debug("有 ctx, cread, tread 数据")
         ctxdata = pd.read_csv(ctx_file, sep='\t')
         creaddata = pd.read_csv(cread_file, sep='\t')
         treaddata = pd.read_csv(tread_file, sep='\t')
     else:
-        print('檔案不存在')
+        print('甲基化数据不存在')
         logger.debug("无 ctx, cread, tread 数据，开始计算...")
         ctxdata, creaddata, treaddata = methylread_counter(tfbs_bed, methylbed, total)
 
@@ -159,11 +160,23 @@ def main():
     genome_file = os.path.join(dir_path, 'genome', f'{species}.fa')
     isfile(genome_file)
 
-    # 读取或生成背景概率
+    # 读取或生成背
     if region == 'whole_genome':
-        bgpps, bg_mCG, bg_mCHG, bg_mCHH = read_bgprob_table(species, celltype, region)
+        logger.info('whole_genome')
+        bg_prob_file = os.path.join(dir_path, "../../Background_probability", region,
+                                    f"{species}_{region}_probability.txt")
+        bg_methyl_prob_file = os.path.join(dir_path, "../../Background_probability", region,
+                                     f"{species}_{celltype}_{region}_methyl_probability.txt")
+        if os.path.isfile(bg_prob_file) and os.path.isfile(bg_methyl_prob_file):
+            print('找到现有的邻近背景概率')
+            logger.info('找到现有的邻近背景概率')
+            bgpps, bg_mCG, bg_mCHG, bg_mCHH = read_bgprob_table(species, celltype, region)
+        else:
+            logger.info('生成邻近背景概率')
+            print('生成邻近背景概率')
+            bgpps, bg_mCG, bg_mCHG, bg_mCHH = whole( species, methylbed, celltype, TF)
     elif region.isdigit():
-        logger.info('处理邻近区域')
+        logger.info('neighbor')
         bg_prob_file = os.path.join(dir_path, '..', 'Background_probability', 'neighbor',
                                     f"{species}_{TF}_{celltype}_{region}_probability.txt")
         bg_methyl_prob_file = os.path.join(dir_path, '..', 'Background_probability', 'neighbor',
@@ -176,11 +189,11 @@ def main():
             flankingbed = flanking_bed(tfbs_bed, spanL, spanR)
             bgpps, bg_mCG, bg_mCHG, bg_mCHH = neighbor(flankingbed, species, methylbed, celltype, region, TF)
     else:
-        logger.info('处理启动子区域')
+        logger.info('promoter')
         bg_prob_file = os.path.join(dir_path, '..', 'Background_probability', 'promoter',
-                                    f"{species}_{TF}_{celltype}_{region}_probability.txt")
+                                    f"{species}_{celltype}_{region}_probability.txt")
         bg_methyl_prob_file = os.path.join(dir_path, '..', 'Background_probability', 'promoter',
-                                           f"{species}_{TF}_{celltype}_{region}_methyl_probability.txt")
+                                           f"{species}_{celltype}_{region}_methyl_probability.txt")
         if os.path.isfile(bg_prob_file) and os.path.isfile(bg_methyl_prob_file):
             logger.info('找到现有的启动子背景概率')
             bgpps, bg_mCG, bg_mCHG, bg_mCHH = read_bgprob_table(species, celltype, region, TF)
