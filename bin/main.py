@@ -163,15 +163,19 @@ def main():
     # 读取或生成背
     if region == 'whole_genome':
         logger.info('whole_genome')
-        bg_prob_file = os.path.join(dir_path, "../../Background_probability", region,
+        bg_prob_file = os.path.join(dir_path,'..', "Background_probability", region,
                                     f"{species}_{region}_probability.txt")
-        bg_methyl_prob_file = os.path.join(dir_path, "../../Background_probability", region,
+        bg_methyl_prob_file = os.path.join(dir_path,'..', "Background_probability", region,
                                      f"{species}_{celltype}_{region}_methyl_probability.txt")
+        print(bg_prob_file)
+        print(bg_methyl_prob_file)
         if os.path.isfile(bg_prob_file) and os.path.isfile(bg_methyl_prob_file):
             print('找到现有的邻近背景概率')
             logger.info('找到现有的邻近背景概率')
             bgpps, bg_mCG, bg_mCHG, bg_mCHH = read_bgprob_table(species, celltype, region)
         else:
+            print(os.path.isfile(bg_prob_file))
+            print(os.path.isfile(bg_methyl_prob_file))
             logger.info('生成邻近背景概率')
             print('生成邻近背景概率')
             bgpps, bg_mCG, bg_mCHG, bg_mCHH = whole( species, methylbed, celltype, TF)
@@ -297,13 +301,16 @@ def main():
     if not result.wasSuccessful():
         print("测试未通过，输出存在错误。")
         logger.info("测试未通过，输出存在错误。")
+        logger.info("")
+        logger.info("--------------------------------------------")
+        logger.info("")
         sys.exit(1)  # 退出程序，返回错误码
     else:
         print("所有测试通过，输出正确。")
         logger.info("所有测试通过，输出正确。")
-    logger.info("")
-    logger.info("--------------------------------------------")
-    logger.info("")
+        logger.info("")
+        logger.info("--------------------------------------------")
+        logger.info("")
 
 
 if __name__ == '__main__':

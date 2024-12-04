@@ -62,16 +62,16 @@ def read_bgprob_table(species, celltype, region, TF=None):
                                     f"{species}_{region}_probability.txt")
         celltype_file = os.path.join(dir_path, "../../Background_probability", region,
                                      f"{species}_{celltype}_{region}_methyl_probability.txt")
-    elif region == 'neighbor':
-        species_file = os.path.join(dir_path, "../../Background_probability", "neighbor",
-                                    f"{species}_{TF}_{celltype}_{region}_probability.txt")
-        celltype_file = os.path.join(dir_path, "../../Background_probability", "neighbor",
-                                     f"{species}_{TF}_{celltype}_{region}_methyl_probability.txt")
-    else : 
+    elif region == 'promoter':
         species_file = os.path.join(dir_path, "../../Background_probability", "promoter",
                                     f"{species}_{celltype}_{region}_probability.txt")
         celltype_file = os.path.join(dir_path, "../../Background_probability", "promoter",
                                      f"{species}_{celltype}_{region}_methyl_probability.txt")
+    else : 
+        species_file = os.path.join(dir_path, "../../Background_probability", "neighbor",
+                                    f"{species}_{TF}_{celltype}_{region}_probability.txt")
+        celltype_file = os.path.join(dir_path, "../../Background_probability", "neighbor",
+                                     f"{species}_{TF}_{celltype}_{region}_methyl_probability.txt")
 
     species_data = isfile(species_file)
     celltype_data = isfile(celltype_file)
