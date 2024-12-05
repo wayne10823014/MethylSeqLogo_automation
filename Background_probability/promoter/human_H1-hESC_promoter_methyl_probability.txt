@@ -1,4 +1,4 @@
 	promoter
-mCG	0.0250
-mCHG	0.0068
-mCHH	0.0081
+mCG	0.2851
+mCHG	0.0171
+mCHH	0.0098
